@@ -9,5 +9,10 @@
     <Import_RootNamespace>FileManagerEngine</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)DriveManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)FileManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)History.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IFileManager.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Interfaces\IHistory.cs" />
   </ItemGroup>
 </Project>
