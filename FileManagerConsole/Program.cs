@@ -7,6 +7,7 @@ using System.Management;
 using System.IO;
 using FileManagerEngine;
 using System.Collections.ObjectModel;
+using System.Runtime.InteropServices;
 
 namespace FileManagerConsole
 {
@@ -14,10 +15,8 @@ namespace FileManagerConsole
     {
         static void Main(string[] args)
         {
-            while (true)
-            {
-
-            }
+            FileManagerWindow manager = new FileManagerWindow();
+            manager.Run();
         }
     }
 }
