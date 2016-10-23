@@ -1,6 +1,7 @@
 ﻿using FileManagerEngine;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -27,6 +28,7 @@ namespace FileManagerConsole
 
         private FileManager FileManager;
         private int SelectedPanel;
+        private FileSystemInfo SelectedItem;
 
         public FileManagerWindow()
         {
@@ -48,6 +50,8 @@ namespace FileManagerConsole
 
             FileManager = new FileManager();
             SelectedPanel = 0;
+            SelectedItem = null;
+            FileManager.SetCurrentDirectory(@"C:\Program Files (x86)");
         }
 
         public void Run()
@@ -63,6 +67,7 @@ namespace FileManagerConsole
             while (true)
             {
                 keyinfo = Console.ReadKey(true);
+
                 if (keyinfo.Key == ConsoleKey.Tab)
                 {
                     SelectedPanel = (++SelectedPanel) % 3;
@@ -84,15 +89,58 @@ namespace FileManagerConsole
                 }
                 else if(keyinfo.Key == ConsoleKey.D1)
                 {
+                    SelectedPanel = 0;
                     SetView(0);
                 }
                 else if (keyinfo.Key == ConsoleKey.D2)
                 {
+                    SelectedPanel = 1;
                     SetView(1);
                 }
                 else if (keyinfo.Key == ConsoleKey.D3)
                 {
+                    SelectedPanel = 2;
                     SetView(2);
+                }
+                else if (SelectedPanel == 2)
+                {
+                    if (keyinfo.Key == ConsoleKey.DownArrow)
+                    {
+                        if (SelectedItem != null)
+                        {
+                            var files = FileManager.GetFilesAndDirectories();
+
+                        }
+                        else
+                            SelectedItem = FileManager.GetFilesAndDirectories()[0];
+                    }
+                    else if (keyinfo.Key == ConsoleKey.LeftArrow)
+                    {
+                        if (SelectedItem != null)
+                        {
+
+                        }
+                        else
+                            SelectedItem = FileManager.GetFilesAndDirectories()[0];
+                    }
+                    else if (keyinfo.Key == ConsoleKey.RightArrow)
+                    {
+                        if (SelectedItem != null)
+                        {
+
+                        }
+                        else
+                            SelectedItem = FileManager.GetFilesAndDirectories()[0];
+                    }
+                    else if (keyinfo.Key == ConsoleKey.UpArrow)
+                    {
+                        if (SelectedItem != null)
+                        {
+
+                        }
+                        else
+                            SelectedItem = FileManager.GetFilesAndDirectories()[0];
+                    }
                 }
             }
         }
@@ -160,7 +208,7 @@ namespace FileManagerConsole
             if (enableText)
                 Console.ForegroundColor = ConsoleColor.DarkGray;
             Console.SetCursorPosition(3, 4);
-            Console.Write("C:\\Program Files\\Visual Studio");
+            Console.Write(FileManager.GetCurrentDirectory().FullName);
 
         }
 
@@ -207,32 +255,26 @@ namespace FileManagerConsole
 
             DrawProperties(enable);
 
-            DrawIcon2(enable, 4, 8);
-            DrawIcon(enable, 15, 8);
-            DrawIcon3(enable, 26, 8);
-            DrawIcon(enable, 37, 8);
-            DrawIcon3(enable, 48, 8);
-            DrawIcon(enable, 59, 8);
-            DrawIcon3(enable, 70, 8);
-            DrawIcon(enable, 81, 8);
-
-            DrawIcon2(enable, 4, 15);
-            DrawIcon(enable, 15, 15);
-            DrawIcon3(enable, 26, 15);
-            DrawIcon(enable, 37, 15);
-            DrawIcon3(enable, 48, 15);
-            DrawIcon(enable, 59, 15);
-            DrawIcon3(enable, 70, 15);
-            DrawIcon(enable, 81, 15);
-
-            DrawIcon2(enable, 4, 22);
-            DrawIcon(enable, 15, 22);
-            DrawIcon3(enable, 26, 22);
-            DrawIcon(enable, 37, 22);
-            DrawIcon3(enable, 48, 22);
-            DrawIcon(enable, 59, 22);
-            DrawIcon3(enable, 70, 22);
-            DrawIcon(enable, 81, 22);
+            //var files = FileManager.GetFilesAndDirectories();
+            //foreach (FileSystemInfo item in files)
+            //{
+            //    if (item is DirectoryInfo)
+            //        DrawIcon(enable, 4, 8);
+            //}
+            var table = GetTable(0);
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    if (table[i, j] != null)
+                    {
+                        var icon = table[i, j];
+                        DrawIcon(icon, enable, (j * 11) + 4, (i * 7) + 8);
+                    }
+                    else
+                        break;
+                }
+            }
         }
 
         private void DrawProperties(bool enable)
@@ -248,10 +290,40 @@ namespace FileManagerConsole
             }
         }
 
-        private void DrawIcon(bool enable, int left, int top)
+        private void DrawIcon(FileSystemInfo item, bool enable, int left, int top)
         {
+            string extension = null;
             if (enable)
-                Console.ForegroundColor = ConsoleColor.DarkMagenta;
+            {
+                if (item is DirectoryInfo)
+                    Console.ForegroundColor = ConsoleColor.Yellow;
+                else
+                {
+                    extension = item.Extension;
+                    switch (extension)
+                    {
+                        case ".txt":
+                            Console.ForegroundColor = ConsoleColor.DarkGray;
+                            break;
+                        case ".rar":
+                            Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                            break;
+                        case ".zip":
+                            Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                            break;
+                        case ".dll":
+                            Console.ForegroundColor = ConsoleColor.DarkGreen;
+                            break;
+                        case ".exe":
+                            Console.ForegroundColor = ConsoleColor.DarkRed;
+                            break;
+                        default:
+                            Console.ForegroundColor = ConsoleColor.DarkGray;
+                            break;
+                    }
+                    
+                }
+            }
             else
                 Console.ForegroundColor = ConsoleColor.Blue;
             //x,y = 4 
@@ -292,111 +364,16 @@ namespace FileManagerConsole
             Console.Write('─');
             Console.Write('─');
             Console.SetCursorPosition(left + 1, top);//4,6
-            Console.Write("ZIP");
+            
+            if (item is FileSystemInfo && !string.IsNullOrEmpty(extension))
+                Console.Write(extension);
 
             Console.SetCursorPosition(left - 1, top + 5);//3,9
-            Console.Write("   file");
-        }
-
-        private void DrawIcon2(bool enable, int left, int top)
-        {
-            if (enable)
-                Console.ForegroundColor = ConsoleColor.Yellow;
+            // poprawić to:
+            if (item.Name.Length > 10)
+                Console.Write(item.Name.Substring(0, 7) + "...");
             else
-                Console.ForegroundColor = ConsoleColor.Blue;
-            //x,y = 4 
-            //Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.SetCursorPosition(left + 1, top);//5,4
-            Console.Write('─');
-            Console.Write('─');
-            Console.Write('─');
-            Console.Write('─');
-            Console.Write('─');
-            Console.Write('─');
-
-            Console.SetCursorPosition(left, top);//4,4
-            Console.Write('╓');
-            Console.SetCursorPosition(left, top + 1);//4,5
-            Console.Write('║');
-            Console.SetCursorPosition(left, top + 2);//4,6
-            Console.Write('║');
-            Console.SetCursorPosition(left, top + 3);//4,7
-            Console.Write('║');
-            Console.SetCursorPosition(left, top + 4);//4,8
-            Console.Write('╙');
-            Console.SetCursorPosition(left + 7, top);//11,4
-            Console.Write('┐');
-            Console.SetCursorPosition(left + 7, top + 1);//11,5
-            Console.Write('│');
-            Console.SetCursorPosition(left + 7, top + 2);//11,6
-            Console.Write('│');
-            Console.SetCursorPosition(left + 7, top + 3);//11,7
-            Console.Write('│');
-            Console.SetCursorPosition(left + 7, top + 4);//11,8
-            Console.Write('┘');
-            Console.SetCursorPosition(left + 1, top + 4);//5,8
-            Console.Write('─');
-            Console.Write('─');
-            Console.Write('─');
-            Console.Write('─');
-            Console.Write('─');
-            Console.Write('─');
-
-
-            Console.SetCursorPosition(left - 1, top + 5);//3,9
-            //Console.BackgroundColor = ConsoleColor.Gray;
-            Console.Write("Program...");
-            //Console.BackgroundColor = ConsoleColor.DarkBlue;
-        }
-
-        private void DrawIcon3(bool enable, int left, int top)
-        {
-            if (enable)
-                Console.ForegroundColor = ConsoleColor.DarkCyan;
-            else
-                Console.ForegroundColor = ConsoleColor.Blue;
-            //x,y = 4 
-            //Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.SetCursorPosition(left + 1, top);//5,4
-            Console.Write('─');
-            Console.Write('─');
-            Console.Write('─');
-            Console.Write('─');
-            Console.Write('─');
-            Console.Write('─');
-
-            Console.SetCursorPosition(left, top);//4,4
-            Console.Write('╓');
-            Console.SetCursorPosition(left, top + 1);//4,5
-            Console.Write('║');
-            Console.SetCursorPosition(left, top + 2);//4,6
-            Console.Write('║');
-            Console.SetCursorPosition(left, top + 3);//4,7
-            Console.Write('║');
-            Console.SetCursorPosition(left, top + 4);//4,8
-            Console.Write('╙');
-            Console.SetCursorPosition(left + 7, top);//11,4
-            Console.Write('┐');
-            Console.SetCursorPosition(left + 7, top + 1);//11,5
-            Console.Write('│');
-            Console.SetCursorPosition(left + 7, top + 2);//11,6
-            Console.Write('│');
-            Console.SetCursorPosition(left + 7, top + 3);//11,7
-            Console.Write('│');
-            Console.SetCursorPosition(left + 7, top + 4);//11,8
-            Console.Write('┘');
-            Console.SetCursorPosition(left + 1, top + 4);//5,8
-            Console.Write('─');
-            Console.Write('─');
-            Console.Write('─');
-            Console.Write('─');
-            Console.Write('─');
-            Console.Write('─');
-            Console.SetCursorPosition(left + 1, top);//4,6
-            Console.Write("DLL");
-
-            Console.SetCursorPosition(left - 1, top + 5);//3,9
-            Console.Write("   file");
+                Console.Write(item.Name);
         }
 
         private void DrawNavbar(bool enable)
@@ -450,6 +427,29 @@ namespace FileManagerConsole
                 Console.ForegroundColor = ConsoleColor.DarkGray;
             }
 
+        }
+
+        private FileSystemInfo[,] GetTable(int page)
+        {
+            var files = FileManager.GetFilesAndDirectories();
+            FileSystemInfo[,] table = new FileSystemInfo[3, 8];
+
+            int col = 0;
+            int row = 0;
+            for (int i = (page * 24); i < files.Count; i++)
+            {
+                if (i == 24)
+                    break;
+                table[row, col] = files[i];
+                col++;
+                if (col == 8)
+                {
+                    row++;
+                    col = 0;
+                }
+            }
+
+            return table;
         }
     }
 }
