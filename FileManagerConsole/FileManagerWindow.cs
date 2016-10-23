@@ -28,7 +28,9 @@ namespace FileManagerConsole
 
         private FileManager FileManager;
         private int SelectedPanel;
+        private int Page;
         private FileSystemInfo SelectedItem;
+
 
         public FileManagerWindow()
         {
@@ -51,7 +53,7 @@ namespace FileManagerConsole
             FileManager = new FileManager();
             SelectedPanel = 0;
             SelectedItem = null;
-            FileManager.SetCurrentDirectory(@"C:\Program Files (x86)");
+            //FileManager.SetCurrentDirectory(@"C:\");
         }
 
         public void Run()
@@ -71,75 +73,113 @@ namespace FileManagerConsole
                 if (keyinfo.Key == ConsoleKey.Tab)
                 {
                     SelectedPanel = (++SelectedPanel) % 3;
-                    switch (SelectedPanel)
-                    {
-                        case 0:
-                            SetView(0);
-                            break;
-                        case 1:
-                            SetView(1);
-                            break;
-                        case 2:
-                            SetView(2);
-                            break;
-                        default:
-                            SetView(0);
-                            break;
-                    }
+                    SetView(SelectedPanel);
                 }
                 else if(keyinfo.Key == ConsoleKey.D1)
-                {
-                    SelectedPanel = 0;
                     SetView(0);
-                }
                 else if (keyinfo.Key == ConsoleKey.D2)
-                {
-                    SelectedPanel = 1;
                     SetView(1);
-                }
                 else if (keyinfo.Key == ConsoleKey.D3)
-                {
-                    SelectedPanel = 2;
                     SetView(2);
-                }
-                else if (SelectedPanel == 2)
+                else if (SelectedPanel == 2 && (keyinfo.Key == ConsoleKey.DownArrow || keyinfo.Key == ConsoleKey.LeftArrow 
+                                               || keyinfo.Key == ConsoleKey.RightArrow || keyinfo.Key == ConsoleKey.UpArrow))
                 {
-                    if (keyinfo.Key == ConsoleKey.DownArrow)
+                    NavigateInDirectory(keyinfo.Key);
+                }
+                else if (SelectedPanel == 2 && keyinfo.Key == ConsoleKey.PageUp)
+                {
+                    if (Page > 0)
                     {
-                        if (SelectedItem != null)
-                        {
-                            var files = FileManager.GetFilesAndDirectories();
-
-                        }
-                        else
-                            SelectedItem = FileManager.GetFilesAndDirectories()[0];
+                        Page--;
+                        SelectedItem = null;
+                        DrawContentPanel(true, true);
                     }
-                    else if (keyinfo.Key == ConsoleKey.LeftArrow)
+                }
+                else if (SelectedPanel == 2 && keyinfo.Key == ConsoleKey.PageDown)
+                {
+                    
+                    int count = FileManager.GetFilesAndDirectories().Count;
+                    int totalPage = (count + 23) / 24;
+                    if ((Page + 1) < totalPage)
                     {
-                        if (SelectedItem != null)
-                        {
-
-                        }
-                        else
-                            SelectedItem = FileManager.GetFilesAndDirectories()[0];
+                        Page++;
+                        SelectedItem = null;
+                        DrawContentPanel(true, true);
                     }
-                    else if (keyinfo.Key == ConsoleKey.RightArrow)
-                    {
-                        if (SelectedItem != null)
-                        {
+                }
+            }
+        }
 
-                        }
-                        else
-                            SelectedItem = FileManager.GetFilesAndDirectories()[0];
-                    }
-                    else if (keyinfo.Key == ConsoleKey.UpArrow)
+        private void NavigateInDirectory(ConsoleKey key)
+        {
+            if (SelectedItem == null)
+            {
+                SelectedItem = GetTable(Page)[0, 0];
+                DrawContentPanel(true);
+            }
+            else
+            {
+                var files = GetTable(Page);
+                Tuple<int?, int?> item = FindItemInTable(GetTable(Page));
+                if (item.Item1.HasValue && item.Item2.HasValue)
+                {
+                    int i, j;
+                    switch (key)
                     {
-                        if (SelectedItem != null)
-                        {
-
-                        }
-                        else
-                            SelectedItem = FileManager.GetFilesAndDirectories()[0];
+                        case ConsoleKey.DownArrow:
+                            i = item.Item1.Value + 1;
+                            j = item.Item2.Value;
+                            if (i >= 0 && i < 3)
+                            {
+                                FileSystemInfo newitem = files[i, j];
+                                if (newitem != null)
+                                {
+                                    SelectedItem = newitem;
+                                    DrawContentPanel(true);
+                                }
+                            }
+                            break;
+                        case ConsoleKey.LeftArrow:
+                            i = item.Item1.Value;
+                            j = item.Item2.Value - 1;
+                            if (j >= 0 && j < 8)
+                            {
+                                FileSystemInfo newitem = files[i, j];
+                                if (newitem != null)
+                                {
+                                    SelectedItem = newitem;
+                                    DrawContentPanel(true);
+                                }
+                            }
+                            break;
+                        case ConsoleKey.RightArrow:
+                            i = item.Item1.Value;
+                            j = item.Item2.Value + 1;
+                            if (j >= 0 && j < 8)
+                            {
+                                FileSystemInfo newitem = files[i, j];
+                                if (newitem != null)
+                                {
+                                    SelectedItem = newitem;
+                                    DrawContentPanel(true);
+                                }
+                            }
+                            break;
+                        case ConsoleKey.UpArrow:
+                            i = item.Item1.Value - 1;
+                            j = item.Item2.Value;
+                            if (i >= 0 && i < 3)
+                            {
+                                FileSystemInfo newitem = files[i, j];
+                                if (newitem != null)
+                                {
+                                    SelectedItem = newitem;
+                                    DrawContentPanel(true);
+                                }
+                            }
+                            break;
+                        default:
+                            break;
                     }
                 }
             }
@@ -147,6 +187,7 @@ namespace FileManagerConsole
 
         private void SetView(int panel)
         {
+            SelectedPanel = panel % 3;
             if (panel == 0)
             {
                 DrawNavbar(true);
@@ -212,7 +253,7 @@ namespace FileManagerConsole
 
         }
 
-        private void DrawContentPanel(bool enable)
+        private void DrawContentPanel(bool enable, bool clearDirectory = false)
         {
             if (enable)
                 Console.ForegroundColor = ConsoleColor.DarkGray;
@@ -248,20 +289,24 @@ namespace FileManagerConsole
             Console.SetCursorPosition(118, 29);
             Console.Write('┘');
 
-            //Console.SetCursorPosition(1, 3);
-            //Console.Write('│');
-            //Console.SetCursorPosition(118, 3);
-            //Console.Write('│');
+            if (clearDirectory)
+                for (int i = 3; i < 118; i++)
+                {
+                    for (int j = 8; j < 29; j++)
+                    {
+                        Console.SetCursorPosition(i, j);
+                        Console.Write(' ');
+                    }
+                }
+
+            Console.SetCursorPosition(100, 28);
+            int totalPage = (FileManager.GetFilesAndDirectories().Count + 23) / 24;
+            string pageof = "Strona " + (Page + 1) + "/" + totalPage;
+            Console.Write(pageof);
 
             DrawProperties(enable);
 
-            //var files = FileManager.GetFilesAndDirectories();
-            //foreach (FileSystemInfo item in files)
-            //{
-            //    if (item is DirectoryInfo)
-            //        DrawIcon(enable, 4, 8);
-            //}
-            var table = GetTable(0);
+            var table = GetTable(Page);
             for (int i = 0; i < 3; i++)
             {
                 for (int j = 0; j < 8; j++)
@@ -274,6 +319,18 @@ namespace FileManagerConsole
                     else
                         break;
                 }
+            }
+            
+            if (SelectedItem != null)
+            {
+                var icon = FindItemInTable(table);
+                if (icon.Item1.HasValue && icon.Item2.HasValue)
+                {
+                    int left = (icon.Item2.Value * 11) + 4;
+                    int top = (icon.Item1.Value * 7) + 8;
+                    DrawIconSelected(SelectedItem, enable, left, top);
+                }
+                    
             }
         }
 
@@ -376,6 +433,22 @@ namespace FileManagerConsole
                 Console.Write(item.Name);
         }
 
+        private void DrawIconSelected(FileSystemInfo item, bool enable, int left, int top)
+        {
+            DrawIcon(item, enable, left, top);
+            if (enable)
+            {
+                Console.SetCursorPosition(left - 1, top + 5);
+                Console.BackgroundColor = ConsoleColor.Red;
+                // poprawić to:
+                if (item.Name.Length > 10)
+                    Console.Write(item.Name.Substring(0, 7) + "...");
+                else
+                    Console.Write(item.Name);
+                Console.BackgroundColor = ConsoleColor.DarkBlue;
+            }
+        }
+
         private void DrawNavbar(bool enable)
         {
             if (enable)
@@ -438,7 +511,7 @@ namespace FileManagerConsole
             int row = 0;
             for (int i = (page * 24); i < files.Count; i++)
             {
-                if (i == 24)
+                if (i == ((page * 24) + 24 ))
                     break;
                 table[row, col] = files[i];
                 col++;
@@ -450,6 +523,28 @@ namespace FileManagerConsole
             }
 
             return table;
+        }
+
+        private Tuple<int?, int?> FindItemInTable(FileSystemInfo[,] table)
+        {
+            int? x = null;
+            int? y = null;
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 8; j++)
+                {
+                    FileSystemInfo item = table[i, j];
+                    if (item != null && item.FullName.Equals(SelectedItem.FullName))
+                    {
+                        x = i;
+                        y = j;
+                        break;
+                    }
+                }
+                if (x.HasValue && y.HasValue)
+                    break;
+            }
+            return new Tuple<int?, int?>(x, y);
         }
     }
 }
