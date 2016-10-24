@@ -10,6 +10,7 @@ namespace FileManagerEngine
     {
         void AddDirectory(DirectoryInfo directory);
         ObservableCollection<DirectoryInfo> GetHistory();
+        ObservableCollection<DirectoryInfo> ClearHistory();
         int GetCurrentIndex();
         bool CanDirectoryGoBack();
         bool CanDirectoryGoForward();

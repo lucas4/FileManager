@@ -12,11 +12,27 @@ namespace FileManagerEngine
         ObservableCollection<DirectoryInfo> historyList = new ObservableCollection<DirectoryInfo>();
         private int index = -1;
 
+        public ObservableCollection<DirectoryInfo> ClearHistory()
+        {
+            historyList.Clear();
+            return historyList;
+        }
 
         public void AddDirectory(DirectoryInfo directory)
         {
-            historyList.Add(directory);
-            index = historyList.Count + 1;
+            if (historyList[index + 1] == directory)
+            {
+                index++;
+            }
+            else
+            {
+                for(int i=historyList.Count - 1; i > index; i--)
+                {
+                    historyList.RemoveAt(i);
+                }
+                historyList.Add(directory);
+                index = historyList.Count + 1;
+            }
         }
 
         public ObservableCollection<DirectoryInfo> GetHistory()
