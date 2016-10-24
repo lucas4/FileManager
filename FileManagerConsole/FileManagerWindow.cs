@@ -92,7 +92,7 @@ namespace FileManagerConsole
                     {
                         Page--;
                         SelectedItem = null;
-                        DrawContentPanel(true, true);
+                        DrawContentPanel(true);
                     }
                 }
                 else if (SelectedPanel == 2 && keyinfo.Key == ConsoleKey.PageDown)
@@ -104,7 +104,7 @@ namespace FileManagerConsole
                     {
                         Page++;
                         SelectedItem = null;
-                        DrawContentPanel(true, true);
+                        DrawContentPanel(true);
                     }
                 }
             }
@@ -253,7 +253,7 @@ namespace FileManagerConsole
 
         }
 
-        private void DrawContentPanel(bool enable, bool clearDirectory = false)
+        private void DrawContentPanel(bool enable, bool clearDirectory = true)
         {
             if (enable)
                 Console.ForegroundColor = ConsoleColor.DarkGray;
@@ -290,14 +290,13 @@ namespace FileManagerConsole
             Console.Write('┘');
 
             if (clearDirectory)
-                for (int i = 3; i < 118; i++)
+            {
+                for (int j = 8; j < 29; j++)
                 {
-                    for (int j = 8; j < 29; j++)
-                    {
-                        Console.SetCursorPosition(i, j);
-                        Console.Write(' ');
-                    }
+                    Console.SetCursorPosition(3, j);
+                    Console.Write(new string(' ', 115));
                 }
+            }
 
             Console.SetCursorPosition(100, 28);
             int totalPage = (FileManager.GetFilesAndDirectories().Count + 23) / 24;
@@ -336,6 +335,11 @@ namespace FileManagerConsole
 
         private void DrawProperties(bool enable)
         {
+            if (enable)
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+            else
+                Console.ForegroundColor = ConsoleColor.Blue;
+
             Console.SetCursorPosition(91, 6);
             Console.Write('┬');
             Console.SetCursorPosition(91, 29);
@@ -344,6 +348,59 @@ namespace FileManagerConsole
             {
                 Console.SetCursorPosition(91, i);
                 Console.Write('│');
+            }
+
+            if (SelectedItem != null)
+            {
+                Console.SetCursorPosition(100, 7);
+                Console.Write("Właściwości");
+
+                Console.SetCursorPosition(93, 10);
+                Console.Write("Nazwa:");
+
+                Console.SetCursorPosition(93, 11);
+                if (SelectedItem.Name.Length > 24)
+                {
+                    string name = SelectedItem.Name;
+                    for (int i = 0; i < 3; i++)
+                    {
+                        Console.SetCursorPosition(93, 11 + i);
+                        if (name.Length > 24)
+                        {
+                            Console.Write(name.Substring(0, 24));
+                            name = name.Substring(24, name.Length - 24);
+                        }
+                        else
+                        {
+                            Console.Write(name);
+                            break;
+                        }
+                    }
+                }
+                else
+                    Console.Write(SelectedItem.Name);
+
+                Console.SetCursorPosition(93, 16);
+                Console.Write("Data utworzenia:");
+
+                Console.SetCursorPosition(93, 17);
+                Console.Write(SelectedItem.CreationTime);
+
+                Console.SetCursorPosition(93, 19);
+                Console.Write("Data modyfkiacji:");
+
+                Console.SetCursorPosition(93, 20);
+                Console.Write(SelectedItem.LastWriteTime);
+
+                if (SelectedItem is FileInfo)
+                {
+                    Console.SetCursorPosition(93, 22);
+                    Console.Write("Rozmiar:");
+
+                    Console.SetCursorPosition(93, 23);
+                    Console.Write((((SelectedItem as FileInfo).Length / 1024f) / 1024f).ToString("0.00") + " MB");
+                }
+
             }
         }
 
