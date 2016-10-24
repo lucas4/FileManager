@@ -23,7 +23,11 @@ namespace FileManagerEngine
 
         public bool CanDirectoryGoUp()
         {
-            throw new NotImplementedException();
+            DirectoryInfo directory = GetCurrentDirectory();
+            if (directory.Parent.Exists)
+                return true;
+            else
+                return false;
         }
 
         public DirectoryInfo CreateDirectory(string path)
@@ -60,7 +64,11 @@ namespace FileManagerEngine
 
         public void DirectoryGoUp()
         {
-            throw new NotImplementedException();
+            if(CanDirectoryGoUp())
+            {
+                DirectoryInfo directory = GetCurrentDirectory().Parent;
+                SetCurrentDirectory(directory.Name);
+            }
         }
 
         public DirectoryInfo GetCurrentDirectory()
@@ -70,7 +78,7 @@ namespace FileManagerEngine
 
         public int GetCurrentIndex()
         {
-            throw new NotImplementedException();
+            return history.GetCurrentIndex();
         }
 
         public ObservableCollection<DirectoryInfo> GetDirectories()
