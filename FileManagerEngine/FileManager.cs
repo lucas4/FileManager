@@ -9,14 +9,16 @@ namespace FileManagerEngine
 {
     partial class FileManager : IFileManager
     {
+        History history = new History();
+
         public bool CanDirectoryGoBack()
         {
-            throw new NotImplementedException();
+            return history.CanDirectoryGoBack();
         }
 
         public bool CanDirectoryGoForward()
         {
-            throw new NotImplementedException();
+            return history.CanDirectoryGoForward();
         }
 
         public bool CanDirectoryGoUp()
@@ -26,32 +28,34 @@ namespace FileManagerEngine
 
         public DirectoryInfo CreateDirectory(string path)
         {
-            throw new NotImplementedException();
+           return Directory.CreateDirectory(path);
         }
 
         public FileInfo CreateFile(string path)
         {
-            throw new NotImplementedException();
+            FileInfo file = new FileInfo(path);
+            file.Create();
+            return file;
         }
 
         public void Delete(DirectoryInfo directory)
         {
-            throw new NotImplementedException();
+            directory.Delete();
         }
 
         public void Delete(FileInfo file)
         {
-            throw new NotImplementedException();
+            file.Delete();
         }
 
         public void DirectoryGoBack()
         {
-            throw new NotImplementedException();
+            history.DirectoryGoBack();
         }
 
         public void DirectoryGoForward()
         {
-            throw new NotImplementedException();
+            history.DirectoryGoForward();
         }
 
         public void DirectoryGoUp()
@@ -118,17 +122,41 @@ namespace FileManagerEngine
 
         public ObservableCollection<DirectoryInfo> GetHistory()
         {
-            throw new NotImplementedException();
+            return history.GetHistory();
         }
 
         public void Rename(DirectoryInfo sourceDirectory, string newDirectoryName)
         {
-            throw new NotImplementedException();
+            {
+                if (sourceDirectory == null)
+                {
+                    throw new ArgumentNullException("sourceDirectory", "Directory info to rename cannot be null");
+                }
+
+                if (string.IsNullOrWhiteSpace(newDirectoryName))
+                {
+                    throw new ArgumentException("New name cannot be null or blank", "name");
+                }
+
+                sourceDirectory.MoveTo(Path.Combine(sourceDirectory.Parent.FullName, newDirectoryName));
+            }
         }
 
         public void Rename(FileInfo sourceFile, string newFileName)
         {
-            throw new NotImplementedException();
+            {
+                if (sourceFile == null)
+                {
+                    throw new ArgumentNullException("sourceFile", "File info to rename cannot be null");
+                }
+
+                if (string.IsNullOrWhiteSpace(newFileName))
+                {
+                    throw new ArgumentException("New name cannot be null or blank", "name");
+                }
+
+                sourceFile.MoveTo(Path.Combine(sourceFile.FullName, newFileName));
+            }
         }
 
         public void SetCurrentDirectory(string directoryPath)
