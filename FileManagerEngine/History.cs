@@ -11,7 +11,6 @@ namespace FileManagerEngine
     {
         ObservableCollection<DirectoryInfo> historyList = new ObservableCollection<DirectoryInfo>();
         private int index = 0;
-
         public ObservableCollection<DirectoryInfo> ClearHistory()
         {
             historyList.Clear();
@@ -20,42 +19,28 @@ namespace FileManagerEngine
 
         public void AddDirectory(DirectoryInfo directory)
         {
-            //if (index < historyList.Count)
-            //{
-            //    if (historyList[index + 1] == directory)
-            //    {
-            //        index++;
-            //    }
-            //    else
-            //    {
-            //        for (int i = historyList.Count - 1; i > index; i--)
-            //        {
-            //            historyList.RemoveAt(i);
-            //        }
-            //        historyList.Add(directory);
-            //        index = historyList.Count - 1;
-            //    }
-            //}
-            //else
-            //{
-            //    historyList.Add(directory);
-            //    index++;
-            //}
-            
-            
-            //if (historyList[index + 1] == directory)
-            //{
-            //    index++;
-            //}
-            //else
-            //{
-            //    for (int i = historyList.Count - 1; i > index; i--)
-            //    {
-            //        historyList.RemoveAt(i);
-            //    }
-            //    historyList.Add(directory);
-            //    index = historyList.Count + 1;
-            //}
+            if (index < historyList.Count && (historyList.Count - index > 1))
+            {
+                if (historyList[index + 1] == directory)
+                {
+                    index++;
+                }
+                else
+                {
+                    for (int i = historyList.Count - 1; i >= index; i--)
+                    {
+                        historyList.RemoveAt(i);
+                    }
+                    historyList.Add(directory);
+                    index = ((historyList.Count) - 1);
+                }
+            }
+            else
+            {
+                historyList.Add(directory);
+                index++;
+            }
+
         }
 
         public ObservableCollection<DirectoryInfo> GetHistory()

@@ -172,6 +172,7 @@ namespace FileManagerEngine
             DirectoryInfo dir = new DirectoryInfo(directoryPath);
             if (dir.Exists)
             {
+
                 Directory.SetCurrentDirectory(dir.FullName);
                 history.AddDirectory(dir);
             }

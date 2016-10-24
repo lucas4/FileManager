@@ -53,7 +53,7 @@ namespace FileManagerConsole
             FileManager = new FileManager();
             SelectedPanel = 0;
             SelectedItem = null;
-            //FileManager.SetCurrentDirectory(@"C:\");
+            FileManager.SetCurrentDirectory(@"C:\");
         }
 
         public void Run()
