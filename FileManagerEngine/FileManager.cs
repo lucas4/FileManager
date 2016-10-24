@@ -9,6 +9,7 @@ namespace FileManagerEngine
 {
     partial class FileManager : IFileManager
     {
+        public EventHandler<ErrorEvent> Error { get; set; }
         History history = new History();
 
         public bool CanDirectoryGoBack()
@@ -30,26 +31,48 @@ namespace FileManagerEngine
                 return false;
         }
 
-        public DirectoryInfo CreateDirectory(string path)
+        public DirectoryInfo CreateDirectory(string path, string name = "Nowy folder")
         {
-           return Directory.CreateDirectory(path);
+            DirectoryInfo dir = new DirectoryInfo(Path.Combine(path, name));
+            try
+            {
+                dir.Create();
+            }
+            catch (Exception ex)
+            {
+                if (Error != null)
+                    Error(this, new ErrorEvent { Value = ex.Message });
+            }
+            return dir;
         }
 
-        public FileInfo CreateFile(string path)
+        public FileInfo CreateFile(string path, string name = "Nowy plik")
         {
-            FileInfo file = new FileInfo(path);
-            file.Create();
+            FileInfo file = new FileInfo(Path.Combine(path, name));
+            try
+            {
+                file.Create().Dispose();
+            }
+            catch (Exception ex)
+            {
+                if (Error != null)
+                    Error(this, new ErrorEvent { Value = ex.Message });
+            }
             return file;
         }
 
-        public void Delete(DirectoryInfo directory)
+        public void Delete(FileSystemInfo file)
         {
-            directory.Delete();
-        }
-
-        public void Delete(FileInfo file)
-        {
-            file.Delete();
+            try
+            {
+                if (file != null && file.Exists)
+                    file.Delete();
+            }
+            catch (Exception ex)
+            {
+                if (Error != null)
+                    Error(this, new ErrorEvent { Value = ex.Message });
+            }
         }
 
         public void DirectoryGoBack()
@@ -64,7 +87,7 @@ namespace FileManagerEngine
 
         public void DirectoryGoUp()
         {
-            if(CanDirectoryGoUp())
+            if (CanDirectoryGoUp())
             {
                 DirectoryInfo directory = GetCurrentDirectory().Parent;
                 SetCurrentDirectory(directory.FullName);
@@ -73,7 +96,17 @@ namespace FileManagerEngine
 
         public DirectoryInfo GetCurrentDirectory()
         {
-            return new DirectoryInfo(Directory.GetCurrentDirectory());
+            DirectoryInfo dir = null;
+            try
+            {
+                dir = new DirectoryInfo(Directory.GetCurrentDirectory());
+            }
+            catch (Exception ex)
+            {
+                if (Error != null)
+                    Error(this, new ErrorEvent { Value = ex.Message });
+            }
+            return dir;
         }
 
         public int GetCurrentIndex()
@@ -88,7 +121,24 @@ namespace FileManagerEngine
             if (!current.Exists)
                 return directorieslist;
 
-            var directories = Directory.GetDirectories(current.FullName);
+            string[] directories = null;
+            try
+            {
+                directories = Directory.GetDirectories(current.FullName);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                SetCurrentDirectory(current.Parent.FullName);
+                if (Error != null)
+                    Error(this, new ErrorEvent { Value = ex.Message });
+                return directorieslist;
+            }
+            catch (Exception ex)
+            {
+                if (Error != null)
+                    Error(this, new ErrorEvent { Value = ex.Message });
+                return directorieslist;
+            }
             foreach (var item in directories)
             {
                 DirectoryInfo directory = new DirectoryInfo(item);
@@ -104,7 +154,17 @@ namespace FileManagerEngine
             if (!current.Exists)
                 return fileslist;
 
-            var files = Directory.GetFiles(current.FullName);
+            string[] files = null;
+            try
+            {
+                files = Directory.GetFiles(current.FullName);
+            }
+            catch (Exception ex)
+            {
+                if (Error != null)
+                    Error(this, new ErrorEvent { Value = ex.Message });
+                return fileslist;
+            }
             foreach (var item in files)
             {
                 FileInfo file = new FileInfo(item);
@@ -116,14 +176,18 @@ namespace FileManagerEngine
         public ObservableCollection<FileSystemInfo> GetFilesAndDirectories()
         {
             ObservableCollection<FileSystemInfo> filesAndDirectories = new ObservableCollection<FileSystemInfo>();
-            foreach (var directory in GetDirectories())
-            {
-                filesAndDirectories.Add(directory);
-            }
-            foreach (var file in GetFiles())
-            {
-                filesAndDirectories.Add(file);
-            }
+            var dirs = GetDirectories();
+            if (dirs != null && dirs.Count > 0)
+                foreach (var directory in GetDirectories())
+                {
+                    filesAndDirectories.Add(directory);
+                }
+            var files = GetFiles();
+            if (files != null && files.Count > 0)
+                foreach (var file in GetFiles())
+                {
+                    filesAndDirectories.Add(file);
+                }
 
             return filesAndDirectories;
         }
@@ -135,35 +199,39 @@ namespace FileManagerEngine
 
         public void Rename(DirectoryInfo sourceDirectory, string newDirectoryName)
         {
+            if (string.IsNullOrWhiteSpace(newDirectoryName))
             {
-                if (sourceDirectory == null)
-                {
-                    throw new ArgumentNullException("sourceDirectory", "Directory info to rename cannot be null");
-                }
-
-                if (string.IsNullOrWhiteSpace(newDirectoryName))
-                {
-                    throw new ArgumentException("New name cannot be null or blank", "name");
-                }
-
-                sourceDirectory.MoveTo(Path.Combine(sourceDirectory.Parent.FullName, newDirectoryName));
+                if (Error != null)
+                    Error(this, new ErrorEvent { Value = "Nazwa nie może być pusta." });
+            }
+            string path = Path.Combine(sourceDirectory.Parent.FullName, newDirectoryName);
+            try
+            {
+                sourceDirectory.MoveTo(path);
+            }
+            catch (Exception ex)
+            {
+                if (Error != null)
+                    Error(this, new ErrorEvent { Value = ex.Message });
             }
         }
 
         public void Rename(FileInfo sourceFile, string newFileName)
         {
+            if (string.IsNullOrWhiteSpace(newFileName))
             {
-                if (sourceFile == null)
-                {
-                    throw new ArgumentNullException("sourceFile", "File info to rename cannot be null");
-                }
-
-                if (string.IsNullOrWhiteSpace(newFileName))
-                {
-                    throw new ArgumentException("New name cannot be null or blank", "name");
-                }
-
-                sourceFile.MoveTo(Path.Combine(sourceFile.FullName, newFileName));
+                if (Error != null)
+                    Error(this, new ErrorEvent { Value = "Nazwa nie może być pusta." });
+            }
+            string path = Path.Combine(sourceFile.Directory.FullName, newFileName);
+            try
+            {
+                sourceFile.MoveTo(path);
+            }
+            catch (Exception ex)
+            {
+                if (Error != null)
+                    Error(this, new ErrorEvent { Value = ex.Message });
             }
         }
 
@@ -172,9 +240,29 @@ namespace FileManagerEngine
             DirectoryInfo dir = new DirectoryInfo(directoryPath);
             if (dir.Exists)
             {
-                Directory.SetCurrentDirectory(dir.FullName);
-                history.AddDirectory(dir);
+                try
+                {
+                    Directory.SetCurrentDirectory(dir.FullName);
+                    history.AddDirectory(dir);
+                }
+                catch (Exception ex)
+                {
+                    if (Error != null)
+                        Error(this, new ErrorEvent { Value = ex.Message });
+                }
             }
         }
     }
+
+    class ErrorEvent : EventArgs
+    {
+        public string Title { get; set; }
+        public string Value { get; set; }
+
+        public ErrorEvent()
+        {
+            this.Title = "ERROR";
+        }
+    }
+
 }

@@ -1,6 +1,7 @@
 ﻿using FileManagerEngine;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
@@ -53,7 +54,13 @@ namespace FileManagerConsole
             FileManager = new FileManager();
             SelectedPanel = 0;
             SelectedItem = null;
+            FileManager.Error += ErrorEvent;
             //FileManager.SetCurrentDirectory(@"C:\");
+        }
+
+        private void ErrorEvent(object sender, ErrorEvent e)
+        {
+            DrawError(e.Title, e.Value);
         }
 
         public void Run()
@@ -81,7 +88,39 @@ namespace FileManagerConsole
                     SetView(1);
                 else if (keyinfo.Key == ConsoleKey.D3)
                     SetView(2);
-                else if (SelectedPanel == 1 && (keyinfo.Key == ConsoleKey.Spacebar))
+                //else if (keyinfo.Key == ConsoleKey.E)
+                //    DrawError("ERROR","Illegal expression!");
+                else if (SelectedPanel == 0 && (keyinfo.Key == ConsoleKey.F || keyinfo.Key == ConsoleKey.P
+                                                || keyinfo.Key == ConsoleKey.E || keyinfo.Key == ConsoleKey.U))
+                {
+                    if (keyinfo.Key == ConsoleKey.U)
+                    {
+                        if (SelectedItem != null)
+                        {
+                            FileManager.Delete(SelectedItem);
+                            SelectedItem = null;
+                            SetView(2);
+                        }
+                    }
+                    else if (keyinfo.Key == ConsoleKey.F)
+                    {
+                        FileManager.CreateDirectory(FileManager.GetCurrentDirectory().FullName);
+                        SetView(2);
+                    }
+                    else if (keyinfo.Key == ConsoleKey.P)
+                    {
+                        FileManager.CreateFile(FileManager.GetCurrentDirectory().FullName);
+                        SetView(2);
+                    }
+                    else if (keyinfo.Key == ConsoleKey.E)
+                    {
+                        if (SelectedItem != null)
+                        {
+                            ReadNewName();
+                        }
+                    }
+                }
+                else if (SelectedPanel == 1 && keyinfo.Key == ConsoleKey.Spacebar)
                 {
                     ReadAddress();
                 }
@@ -128,11 +167,11 @@ namespace FileManagerConsole
                         }
                         else if (SelectedItem is FileInfo)
                         {
-
+                            Console.Beep();
                         }
                     }
                 }
-                else if (SelectedPanel == 2 && (keyinfo.Key == ConsoleKey.DownArrow || keyinfo.Key == ConsoleKey.LeftArrow 
+                else if (SelectedPanel == 2 && (keyinfo.Key == ConsoleKey.DownArrow || keyinfo.Key == ConsoleKey.LeftArrow
                                                || keyinfo.Key == ConsoleKey.RightArrow || keyinfo.Key == ConsoleKey.UpArrow))
                 {
                     NavigateInDirectory(keyinfo.Key);
@@ -148,7 +187,7 @@ namespace FileManagerConsole
                 }
                 else if (SelectedPanel == 2 && keyinfo.Key == ConsoleKey.PageDown)
                 {
-                    
+
                     int count = FileManager.GetFilesAndDirectories().Count;
                     int totalPage = (count + 23) / 24;
                     if ((Page + 1) < totalPage)
@@ -186,6 +225,29 @@ namespace FileManagerConsole
             }
             else
                 SetView(1);
+        }
+
+        private void ReadNewName()
+        {
+            SetView(2);
+
+            Console.SetCursorPosition(3, 4);
+            Console.Write(new string(' ', 115));
+
+            Console.SetCursorPosition(3, 4);
+            Console.CursorVisible = true;
+            string name = ReadPath(SelectedItem.Name);
+            Console.CursorVisible = false;
+            if (SelectedItem is FileInfo)
+            {
+                FileManager.Rename(SelectedItem as FileInfo, name);
+            }
+            else if (SelectedItem is DirectoryInfo)
+            {
+                FileManager.Rename(SelectedItem as DirectoryInfo, name);
+            }
+            SelectedItem = null;
+            SetView(2);
         }
 
         private void NavigateInDirectory(ConsoleKey key)
@@ -573,6 +635,7 @@ namespace FileManagerConsole
         private void DrawIconSelected(FileSystemInfo item, bool enable, int left, int top)
         {
             DrawIcon(item, enable, left, top);
+            enable = true;
             if (enable)
             {
                 Console.SetCursorPosition(left - 1, top + 5);
@@ -618,25 +681,104 @@ namespace FileManagerConsole
             Console.Write('┘');
 
             Console.SetCursorPosition(4, 1);
+            Console.Write("Nowy");
+            Console.SetCursorPosition(9, 1);
             Console.Write("Plik");
             if (enable)
             {
-                Console.SetCursorPosition(4, 1);
+                Console.SetCursorPosition(9, 1);
                 Console.ForegroundColor = ConsoleColor.Gray;
                 Console.Write("P");
                 Console.ForegroundColor = ConsoleColor.DarkGray;
             }
 
-            Console.SetCursorPosition(10, 1);
-            Console.Write("Edycja");
+            Console.SetCursorPosition(15, 0);
+            Console.Write('┬');
+            Console.SetCursorPosition(15, 1);
+            Console.Write('│');
+            Console.SetCursorPosition(15, 2);
+            Console.Write('┴');
+
+            Console.SetCursorPosition(18, 1);
+            Console.Write("Nowy");
+            Console.SetCursorPosition(23, 1);
+            Console.Write("Folder");
             if (enable)
             {
-                Console.SetCursorPosition(10, 1);
+                Console.SetCursorPosition(23, 1);
+                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.Write("F");
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+            }
+
+            Console.SetCursorPosition(31, 0);
+            Console.Write('┬');
+            Console.SetCursorPosition(31, 1);
+            Console.Write('│');
+            Console.SetCursorPosition(31, 2);
+            Console.Write('┴');
+
+            Console.SetCursorPosition(34, 1);
+            Console.Write("Edycja");
+            
+            if (enable)
+            {
+                Console.SetCursorPosition(34, 1);
                 Console.ForegroundColor = ConsoleColor.Gray;
                 Console.Write("E");
                 Console.ForegroundColor = ConsoleColor.DarkGray;
             }
 
+            Console.SetCursorPosition(42, 0);
+            Console.Write('┬');
+            Console.SetCursorPosition(42, 1);
+            Console.Write('│');
+            Console.SetCursorPosition(42, 2);
+            Console.Write('┴');
+
+            Console.SetCursorPosition(45, 1);
+            Console.Write("Usuń");
+
+            if (enable)
+            {
+                Console.SetCursorPosition(45, 1);
+                Console.ForegroundColor = ConsoleColor.Gray;
+                Console.Write("U");
+                Console.ForegroundColor = ConsoleColor.DarkGray;
+            }
+
+            Console.SetCursorPosition(51, 0);
+            Console.Write('┬');
+            Console.SetCursorPosition(51, 1);
+            Console.Write('│');
+            Console.SetCursorPosition(51, 2);
+            Console.Write('┴');
+        }
+
+        private void DrawError(string title, string value)
+        {
+            Console.BackgroundColor = ConsoleColor.DarkRed;
+            for (int i = 20; i < 100; i++)
+            {
+                for (int j = 10; j < 18; j++)
+                {
+                    Console.SetCursorPosition(i, j);
+                    Console.Write(' ');
+                }
+            }
+            
+            Console.ForegroundColor = ConsoleColor.White;
+
+            Console.SetCursorPosition(53, 11);
+            Console.Write(title);
+
+            Console.SetCursorPosition(22, 13);
+            Console.Write(value);
+            var k = Console.ReadKey();
+
+
+            Console.BackgroundColor = ConsoleColor.DarkBlue;
+            SetView(0);
         }
 
         private string ReadPath(string Default)
@@ -677,7 +819,7 @@ namespace FileManagerConsole
 
         private FileSystemInfo[,] GetTable(int page)
         {
-            var files = FileManager.GetFilesAndDirectories();
+            ObservableCollection<FileSystemInfo> files = FileManager.GetFilesAndDirectories();
             FileSystemInfo[,] table = new FileSystemInfo[3, 8];
 
             int col = 0;
