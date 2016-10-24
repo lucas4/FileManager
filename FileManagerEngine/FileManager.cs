@@ -24,7 +24,7 @@ namespace FileManagerEngine
         public bool CanDirectoryGoUp()
         {
             DirectoryInfo directory = GetCurrentDirectory();
-            if (directory.Parent.Exists)
+            if (directory.Parent != null && directory.Parent.Exists)
                 return true;
             else
                 return false;
@@ -54,12 +54,12 @@ namespace FileManagerEngine
 
         public void DirectoryGoBack()
         {
-            history.DirectoryGoBack();
+            Directory.SetCurrentDirectory(history.DirectoryGoBack().FullName);
         }
 
         public void DirectoryGoForward()
         {
-            history.DirectoryGoForward();
+            Directory.SetCurrentDirectory(history.DirectoryGoForward().FullName);
         }
 
         public void DirectoryGoUp()
@@ -67,7 +67,7 @@ namespace FileManagerEngine
             if(CanDirectoryGoUp())
             {
                 DirectoryInfo directory = GetCurrentDirectory().Parent;
-                SetCurrentDirectory(directory.Name);
+                SetCurrentDirectory(directory.FullName);
             }
         }
 
@@ -171,7 +171,10 @@ namespace FileManagerEngine
         {
             DirectoryInfo dir = new DirectoryInfo(directoryPath);
             if (dir.Exists)
+            {
                 Directory.SetCurrentDirectory(dir.FullName);
+                history.AddDirectory(dir);
+            }
         }
     }
 }

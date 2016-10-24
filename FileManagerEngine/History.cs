@@ -10,7 +10,7 @@ namespace FileManagerEngine
     partial class History : IHistory
     {
         ObservableCollection<DirectoryInfo> historyList = new ObservableCollection<DirectoryInfo>();
-        private int index = -1;
+        private int index = 0;
 
         public ObservableCollection<DirectoryInfo> ClearHistory()
         {
@@ -20,19 +20,42 @@ namespace FileManagerEngine
 
         public void AddDirectory(DirectoryInfo directory)
         {
-            if (historyList[index + 1] == directory)
-            {
-                index++;
-            }
-            else
-            {
-                for(int i=historyList.Count - 1; i > index; i--)
-                {
-                    historyList.RemoveAt(i);
-                }
-                historyList.Add(directory);
-                index = historyList.Count + 1;
-            }
+            //if (index < historyList.Count)
+            //{
+            //    if (historyList[index + 1] == directory)
+            //    {
+            //        index++;
+            //    }
+            //    else
+            //    {
+            //        for (int i = historyList.Count - 1; i > index; i--)
+            //        {
+            //            historyList.RemoveAt(i);
+            //        }
+            //        historyList.Add(directory);
+            //        index = historyList.Count - 1;
+            //    }
+            //}
+            //else
+            //{
+            //    historyList.Add(directory);
+            //    index++;
+            //}
+            
+            
+            //if (historyList[index + 1] == directory)
+            //{
+            //    index++;
+            //}
+            //else
+            //{
+            //    for (int i = historyList.Count - 1; i > index; i--)
+            //    {
+            //        historyList.RemoveAt(i);
+            //    }
+            //    historyList.Add(directory);
+            //    index = historyList.Count + 1;
+            //}
         }
 
         public ObservableCollection<DirectoryInfo> GetHistory()
@@ -47,7 +70,7 @@ namespace FileManagerEngine
 
         public bool CanDirectoryGoBack()
         {
-            if ((index - 1) >= 0)
+            if ((index - 1) > 0)
                 return true;
             else
                 return false;
@@ -64,7 +87,7 @@ namespace FileManagerEngine
         public DirectoryInfo DirectoryGoBack()
         {
             if (CanDirectoryGoBack()) index--;
-            return historyList[index];
+            return historyList[index - 1];
         }
 
         public DirectoryInfo DirectoryGoForward()

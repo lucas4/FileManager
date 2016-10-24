@@ -75,7 +75,7 @@ namespace FileManagerConsole
                     SelectedPanel = (++SelectedPanel) % 3;
                     SetView(SelectedPanel);
                 }
-                else if(keyinfo.Key == ConsoleKey.D1)
+                else if (keyinfo.Key == ConsoleKey.D1)
                     SetView(0);
                 else if (keyinfo.Key == ConsoleKey.D2)
                     SetView(1);
@@ -84,6 +84,36 @@ namespace FileManagerConsole
                 else if (SelectedPanel == 1 && (keyinfo.Key == ConsoleKey.Spacebar))
                 {
                     ReadAddress();
+                }
+                else if (SelectedPanel == 2 && keyinfo.Key == ConsoleKey.Backspace)
+                {
+                    if (FileManager.CanDirectoryGoUp())
+                    {
+                        FileManager.DirectoryGoUp();
+                        SelectedItem = null;
+                        DrawAddressBar(false, true);
+                        DrawContentPanel(true);
+                    }
+                }
+                else if (SelectedPanel == 2 && keyinfo.Key == ConsoleKey.Oem4)
+                {
+                    if (FileManager.CanDirectoryGoBack())
+                    {
+                        FileManager.DirectoryGoBack();
+                        SelectedItem = null;
+                        DrawAddressBar(false, true);
+                        DrawContentPanel(true);
+                    }
+                }
+                else if (SelectedPanel == 2 && keyinfo.Key == ConsoleKey.Oem6)
+                {
+                    if (FileManager.CanDirectoryGoForward())
+                    {
+                        FileManager.DirectoryGoForward();
+                        SelectedItem = null;
+                        DrawAddressBar(false, true);
+                        DrawContentPanel(true);
+                    }
                 }
                 else if (SelectedPanel == 2 && keyinfo.Key == ConsoleKey.Enter)
                 {
