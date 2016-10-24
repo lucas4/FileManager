@@ -81,6 +81,27 @@ namespace FileManagerConsole
                     SetView(1);
                 else if (keyinfo.Key == ConsoleKey.D3)
                     SetView(2);
+                else if (SelectedPanel == 1 && (keyinfo.Key == ConsoleKey.Spacebar))
+                {
+                    ReadAddress();
+                }
+                else if (SelectedPanel == 2 && keyinfo.Key == ConsoleKey.Enter)
+                {
+                    if (SelectedItem != null && SelectedItem.Exists)
+                    {
+                        if (SelectedItem is DirectoryInfo)
+                        {
+                            FileManager.SetCurrentDirectory(SelectedItem.FullName);
+                            SelectedItem = null;
+                            DrawAddressBar(false, true);
+                            DrawContentPanel(true);
+                        }
+                        else if (SelectedItem is FileInfo)
+                        {
+
+                        }
+                    }
+                }
                 else if (SelectedPanel == 2 && (keyinfo.Key == ConsoleKey.DownArrow || keyinfo.Key == ConsoleKey.LeftArrow 
                                                || keyinfo.Key == ConsoleKey.RightArrow || keyinfo.Key == ConsoleKey.UpArrow))
                 {
@@ -108,6 +129,33 @@ namespace FileManagerConsole
                     }
                 }
             }
+        }
+
+        private void ReadAddress()
+        {
+            Console.CursorVisible = true;
+            Console.SetCursorPosition(3, 4);
+            string path = ReadPath(FileManager.GetCurrentDirectory().FullName);
+            Console.CursorVisible = false;
+
+            DirectoryInfo dir;
+            try
+            {
+                dir = new DirectoryInfo(path);
+            }
+            catch
+            {
+                dir = new DirectoryInfo(FileManager.GetCurrentDirectory().FullName);
+            }
+
+            if (dir.Exists)
+            {
+                FileManager.SetCurrentDirectory(dir.FullName);
+                SelectedItem = null;
+                SetView(2);
+            }
+            else
+                SetView(1);
         }
 
         private void NavigateInDirectory(ConsoleKey key)
@@ -190,31 +238,31 @@ namespace FileManagerConsole
             SelectedPanel = panel % 3;
             if (panel == 0)
             {
-                DrawNavbar(true);
-                DrawAddressBar(false, false);
+                DrawAddressBar(false);
                 DrawContentPanel(false);
+                DrawNavbar(true);
             }
             else if (panel == 1)
             {
                 DrawNavbar(false);
-                DrawAddressBar(true, true);
                 DrawContentPanel(false);
+                DrawAddressBar(true, true);
             }
             else if (panel == 2)
             {
-                DrawNavbar(false);
-                DrawAddressBar(false, true);
                 DrawContentPanel(true);
+                DrawNavbar(false);
+                DrawAddressBar(false, true); 
             }
             else
             {
                 DrawNavbar(true);
-                DrawAddressBar(false, false);
+                DrawAddressBar(false);
                 DrawContentPanel(false);
             }
         }
 
-        private void DrawAddressBar(bool enable, bool enableText)
+        private void DrawAddressBar(bool enable, bool enableText = false)
         {
             if (enable)
                 Console.ForegroundColor = ConsoleColor.DarkGray;
@@ -246,11 +294,13 @@ namespace FileManagerConsole
             Console.SetCursorPosition(118, 5);
             Console.Write('┘');
 
+            Console.SetCursorPosition(3, 4);
+            Console.Write(new string(' ', 115));
+
             if (enableText)
                 Console.ForegroundColor = ConsoleColor.DarkGray;
             Console.SetCursorPosition(3, 4);
             Console.Write(FileManager.GetCurrentDirectory().FullName);
-
         }
 
         private void DrawContentPanel(bool enable, bool clearDirectory = true)
@@ -557,6 +607,42 @@ namespace FileManagerConsole
                 Console.ForegroundColor = ConsoleColor.DarkGray;
             }
 
+        }
+
+        private string ReadPath(string Default)
+        {
+            int pos = Console.CursorLeft;
+            Console.Write(Default);
+            ConsoleKeyInfo info;
+            List<char> chars = new List<char>();
+            if (string.IsNullOrEmpty(Default) == false)
+            {
+                chars.AddRange(Default.ToCharArray());
+            }
+
+            while (true)
+            {
+                info = Console.ReadKey(true);
+                if (info.Key == ConsoleKey.Backspace && Console.CursorLeft > pos)
+                {
+                    chars.RemoveAt(chars.Count - 1);
+                    Console.CursorLeft -= 1;
+                    Console.Write(' ');
+                    Console.CursorLeft -= 1;
+
+                }
+                else if (info.Key == ConsoleKey.Enter) { Console.Write(Environment.NewLine); break; }
+                //Here you need create own checking of symbols
+                else if (info.KeyChar != '\b' && info.KeyChar != '\n' && info.KeyChar != '\t' && info.KeyChar != '\r') //if (char.IsLetterOrDigit(info.KeyChar)) 
+                {
+                    if (chars.ToArray().Length < 115)
+                    {
+                        Console.Write(info.KeyChar);
+                        chars.Add(info.KeyChar);
+                    }
+                }
+            }
+            return new string(chars.ToArray());
         }
 
         private FileSystemInfo[,] GetTable(int page)
