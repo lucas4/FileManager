@@ -440,8 +440,8 @@ namespace FileManagerConsole
                 }
             }
 
-            Console.SetCursorPosition(100, 28);
             int totalPage = (FileManager.GetFilesAndDirectories().Count + 23) / 24;
+            Console.SetCursorPosition(100, 28);
             string pageof = "Strona " + (Page + 1) + "/" + totalPage;
             Console.Write(pageof);
 
@@ -771,14 +771,32 @@ namespace FileManagerConsole
 
             Console.SetCursorPosition(53, 11);
             Console.Write(title);
-
+            
             Console.SetCursorPosition(22, 13);
-            Console.Write(value);
+            if (value.Length > 24)
+            {
+                string text = value;
+                for (int i = 0; i < 3; i++)
+                {
+                    Console.SetCursorPosition(22, 13 + i);
+                    if (text.Length > 76)
+                    {
+                        Console.Write(text.Substring(0, 76));
+                        text = text.Substring(76, text.Length - 76);
+                    }
+                    else
+                    {
+                        Console.Write(text);
+                        break;
+                    }
+                }
+            }
+            else
+                Console.Write(value);
+
             var k = Console.ReadKey();
-
-
             Console.BackgroundColor = ConsoleColor.DarkBlue;
-            SetView(0);
+            SetView(2);
         }
 
         private string ReadPath(string Default)
