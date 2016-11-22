@@ -5,8 +5,45 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FileManagerWPF"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
+        Title="MainWindow" Height="550" Width="900">
     <Grid>
-        
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid x:Name="MenuGrid" Grid.Row="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Menu Grid.Row="0" IsMainMenu="True">
+                <MenuItem Header="_File" />
+                <MenuItem Header="_Edit" />
+                <MenuItem Header="_View" />
+                <MenuItem Header="_Window" />
+                <MenuItem Header="_Help" />
+            </Menu>
+            <Grid Grid.Row="1" Height="20">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Orientation="Horizontal">
+                    <Button Content="A" Width="20" />
+                    <Button Content="B" Width="20" />
+                    <Button Content="A" Width="20" />
+                    <Button Content="B" Width="20" />
+                </StackPanel>
+                <TextBox x:Name="AddressTextBox" Grid.Column="1" Text="adres" HorizontalAlignment="Stretch" />
+            </Grid>
+        </Grid>
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="50" />
+                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <GridSplitter Grid.Column="1" Width="5" VerticalAlignment="Stretch" />
+        </Grid>
     </Grid>
 </Window>
