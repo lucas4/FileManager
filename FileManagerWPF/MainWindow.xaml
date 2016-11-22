@@ -39,18 +39,23 @@
         </Grid>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="50" />
+                <ColumnDefinition Width="150" />
                 <ColumnDefinition Width="5" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <GridSplitter Grid.Column="1" Width="5" VerticalAlignment="Stretch" />
-            <ListBox Grid.Column="2" ItemsSource="{Binding MyItemsSource}" x:Name="lb" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel IsItemsHost="True" Orientation="Horizontal" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ListBox>
+            <Grid Grid.Column="0">
+                <TreeView Name="trvMenu">
+                    <TreeView.ItemTemplate>
+                        <HierarchicalDataTemplate DataType="{x:Type MenuItem}" ItemsSource="{Binding Items}">
+                            <TextBlock Text="{Binding Title}" />
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
+
+
+
+            </Grid>  
         </Grid>
     </Grid>
 </Window>
