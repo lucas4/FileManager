@@ -55,7 +55,7 @@ namespace FileManagerConsole
             SelectedPanel = 0;
             SelectedItem = null;
             FileManager.Error += ErrorEvent;
-            //FileManager.SetCurrentDirectory(@"C:\");
+            FileManager.SetCurrentDirectory(@"C:\");
         }
 
         private void ErrorEvent(object sender, ErrorEvent e)
