@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -23,6 +24,16 @@ namespace FileManagerWPF
         public MainWindow()
         {
             InitializeComponent();
+
+            lb.Items.Add("aaa");
+            lb.Items.Add("bbb");
+            lb.Items.Add("ddd");
+            lb.Items.Add("ddd");
+            lb.Items.Add("aaa");
+            lb.Items.Add("bbb");
+            lb.Items.Add("ddd");
+            lb.Items.Add("ddd");
+
         }
     }
 }

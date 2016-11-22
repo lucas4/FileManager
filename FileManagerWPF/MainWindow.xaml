@@ -44,6 +44,13 @@
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
             <GridSplitter Grid.Column="1" Width="5" VerticalAlignment="Stretch" />
+            <ListBox Grid.Column="2" ItemsSource="{Binding MyItemsSource}" x:Name="lb" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel IsItemsHost="True" Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ListBox>
         </Grid>
     </Grid>
 </Window>
