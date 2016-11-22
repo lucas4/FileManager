@@ -7,7 +7,7 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "FileManagerEngine", "FileMa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileManagerConsole", "FileManagerConsole\FileManagerConsole.csproj", "{88416E59-3181-45B0-96BB-F79FF79EC4CC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileManagerWPF", "FileManagerWPF\FileManagerWPF.csproj", "{A06B5445-D1DD-4EB5-B012-845877E71146}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FileManagerWPF", "FileManagerWPF\FileManagerWPF.csproj", "{533E0CED-D196-4DB5-9AE3-A7B84D1E0D63}"
 EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
@@ -23,10 +23,10 @@ Global
 		{88416E59-3181-45B0-96BB-F79FF79EC4CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{88416E59-3181-45B0-96BB-F79FF79EC4CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{88416E59-3181-45B0-96BB-F79FF79EC4CC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{A06B5445-D1DD-4EB5-B012-845877E71146}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{A06B5445-D1DD-4EB5-B012-845877E71146}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{A06B5445-D1DD-4EB5-B012-845877E71146}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{A06B5445-D1DD-4EB5-B012-845877E71146}.Release|Any CPU.Build.0 = Release|Any CPU
+		{533E0CED-D196-4DB5-9AE3-A7B84D1E0D63}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{533E0CED-D196-4DB5-9AE3-A7B84D1E0D63}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{533E0CED-D196-4DB5-9AE3-A7B84D1E0D63}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{533E0CED-D196-4DB5-9AE3-A7B84D1E0D63}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
