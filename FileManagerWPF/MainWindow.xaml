@@ -52,10 +52,14 @@
                         </HierarchicalDataTemplate>
                     </TreeView.ItemTemplate>
                 </TreeView>
-
-
-
-            </Grid>  
+            </Grid>
+            <ListBox Grid.Column="2" x:Name="lb" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                <ItemsControl.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel IsItemsHost="True" Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ItemsControl.ItemsPanel>
+            </ListBox>
         </Grid>
     </Grid>
 </Window>
