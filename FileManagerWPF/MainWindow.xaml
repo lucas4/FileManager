@@ -40,26 +40,31 @@
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="150" />
-                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="auto" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <GridSplitter Grid.Column="1" Width="5" VerticalAlignment="Stretch" />
+            <!--<GridSplitter Grid.Column="1" Width="5" VerticalAlignment="Stretch" />-->
             <Grid Grid.Column="0">
-                <TreeView Name="trvMenu">
+                <TreeView Name="trvMenu" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
                     <TreeView.ItemTemplate>
                         <HierarchicalDataTemplate DataType="{x:Type MenuItem}" ItemsSource="{Binding Items}">
-                            <TextBlock Text="{Binding Title}" />
+                            <StackPanel Orientation="Horizontal">
+                                <Image Height="30" Width="30" Source="{Binding File.Image}" />
+                                <TextBlock Text="{Binding File.Name}" />
+                            </StackPanel>
                         </HierarchicalDataTemplate>
                     </TreeView.ItemTemplate>
                 </TreeView>
             </Grid>
-            <ListBox Grid.Column="2" x:Name="lb" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
-                <ItemsControl.ItemsPanel>
-                    <ItemsPanelTemplate>
-                        <WrapPanel IsItemsHost="True" Orientation="Horizontal" />
-                    </ItemsPanelTemplate>
-                </ItemsControl.ItemsPanel>
-            </ListBox>
+            <Grid Grid.Column="2">
+                <ListBox x:Name="lb" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+                    <ItemsControl.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <WrapPanel IsItemsHost="True" Orientation="Horizontal" />
+                        </ItemsPanelTemplate>
+                    </ItemsControl.ItemsPanel>
+                </ListBox>
+            </Grid>
         </Grid>
     </Grid>
 </Window>

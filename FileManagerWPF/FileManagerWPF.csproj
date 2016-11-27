@@ -62,6 +62,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="FileObject.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -94,9 +95,95 @@
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <ItemGroup>
-    <Folder Include="Images\Extensions\" />
-    <Folder Include="Images\Folders\" />
+    <Resource Include="Images\Extensions\aac.png" />
+    <Resource Include="Images\Extensions\ace.png" />
+    <Resource Include="Images\Extensions\ai.png" />
+    <Resource Include="Images\Extensions\aut.png" />
+    <Resource Include="Images\Extensions\avi.png" />
+    <Resource Include="Images\Extensions\bin.png" />
+    <Resource Include="Images\Extensions\bmp.png" />
+    <Resource Include="Images\Extensions\cad.png" />
+    <Resource Include="Images\Extensions\cdr.png" />
+    <Resource Include="Images\Extensions\css.png" />
+    <Resource Include="Images\Extensions\db.png" />
+    <Resource Include="Images\Extensions\dmg.png" />
+    <Resource Include="Images\Extensions\doc.png" />
+    <Resource Include="Images\Extensions\docx.png" />
+    <Resource Include="Images\Extensions\dwf.png" />
+    <Resource Include="Images\Extensions\dwg.png" />
+    <Resource Include="Images\Extensions\eps.png" />
+    <Resource Include="Images\Extensions\exe.png" />
+    <Resource Include="Images\Extensions\flac.png" />
+    <Resource Include="Images\Extensions\gif.png" />
+    <Resource Include="Images\Extensions\hlp.png" />
+    <Resource Include="Images\Extensions\htm.png" />
+    <Resource Include="Images\Extensions\html.png" />
+    <Resource Include="Images\Extensions\ini.png" />
+    <Resource Include="Images\Extensions\iso.png" />
+    <Resource Include="Images\Extensions\java.png" />
+    <Resource Include="Images\Extensions\jpg.png" />
+    <Resource Include="Images\Extensions\js.png" />
+    <Resource Include="Images\Extensions\mkv.png" />
+    <Resource Include="Images\Extensions\mov.png" />
+    <Resource Include="Images\Extensions\mp3.png" />
+    <Resource Include="Images\Extensions\mp4.png" />
+    <Resource Include="Images\Extensions\mpg.png" />
+    <Resource Include="Images\Extensions\pdf.png" />
+    <Resource Include="Images\Extensions\php.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Extensions\png.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Extensions\ppt.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Extensions\ps.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Extensions\psd.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Extensions\rar.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Extensions\rss.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Extensions\rtf.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Extensions\svg.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Extensions\swf.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Extensions\sys.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Extensions\tiff.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Extensions\txt.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Extensions\xls.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Extensions\xlsx.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Images\Extensions\zip.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Folders\folder.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

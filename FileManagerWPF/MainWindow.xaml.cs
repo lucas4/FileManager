@@ -26,14 +26,14 @@ namespace FileManagerWPF
         public MainWindow()
         {
             InitializeComponent();
-            MenuItem root = new MenuItem() { Title = "Menu" };
-            MenuItem childItem1 = new MenuItem() { Title = "Child item #1" };
-            childItem1.Items.Add(new MenuItem() { Title = "Child item #1.1" });
-            childItem1.Items.Add(new MenuItem() { Title = "Child item #1.2" });
+            MenuItem root = new MenuItem(@"C:\");
+            MenuItem childItem1 = new MenuItem(@"C:\matlab");
+            childItem1.Items.Add(new MenuItem(@"C:\matlab"));
+            childItem1.Items.Add(new MenuItem(@"C:\matlab"));
             root.Items.Add(childItem1);
-            root.Items.Add(new MenuItem() { Title = "Child item #2" });
+            root.Items.Add(new MenuItem(@"C:\matlab"));
             trvMenu.Items.Add(root);
-
+            
 
             lb.Items.Add("aaa");
             lb.Items.Add("bbb");
@@ -47,14 +47,14 @@ namespace FileManagerWPF
         }
         public class MenuItem
         {
-            public MenuItem()
+            public ObservableCollection<MenuItem> Items { get; set; }
+            public FileManagerObject File { get; set; }
+
+            public MenuItem(string Path)
             {
                 this.Items = new ObservableCollection<MenuItem>();
+                this.File = new FileObject(Path);
             }
-
-            public string Title { get; set; }
-
-            public ObservableCollection<MenuItem> Items { get; set; }
         }
 
     }
