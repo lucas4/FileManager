@@ -6,6 +6,20 @@
         xmlns:local="clr-namespace:FileManagerWPF"
         mc:Ignorable="d"
         Title="MainWindow" Height="550" Width="900">
+    <Window.Resources>
+        <DataTemplate x:Key="ItemTemplate">
+            <WrapPanel Orientation="Horizontal">
+                <Image Width="50" Height="50" Stretch="Fill" Source="{Binding Image}"/>
+                <Label Foreground="Black" Content="{Binding Title}" />
+            </WrapPanel>
+        </DataTemplate>
+        <ItemsPanelTemplate x:Key="ListViewMediumIconsItem">
+            <WrapPanel IsItemsHost="True" Orientation="Horizontal" />
+        </ItemsPanelTemplate>
+        <ItemsPanelTemplate x:Key="ListViewSmallIconsItem">
+            <WrapPanel IsItemsHost="True" Orientation="Horizontal" />
+        </ItemsPanelTemplate>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="auto" />
@@ -53,13 +67,14 @@
                     </TreeView.ItemTemplate>
                 </TreeView>
             </Grid>
-            <ListBox Grid.Column="2" x:Name="lb" ScrollViewer.HorizontalScrollBarVisibility="Disabled">
+            <ListBox Visibility="Hidden" Grid.Column="2" x:Name="lb" ScrollViewer.HorizontalScrollBarVisibility="Disabled" SelectionMode="Extended">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <WrapPanel IsItemsHost="True" Orientation="Horizontal" />
                     </ItemsPanelTemplate>
                 </ItemsControl.ItemsPanel>
             </ListBox>
+            <ListView x:Name="ListView1" Grid.Column="2" ScrollViewer.HorizontalScrollBarVisibility="Disabled" ItemTemplate="{StaticResource ItemTemplate}" ItemsPanel="{StaticResource ListViewMediumIconsItem}" />
         </Grid>
     </Grid>
 </Window>
