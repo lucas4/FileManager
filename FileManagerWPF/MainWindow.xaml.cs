@@ -14,6 +14,9 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using FileManagerEngine;
+using System.IO;
+using System.Management;
 
 namespace FileManagerWPF
 {
@@ -24,60 +27,66 @@ namespace FileManagerWPF
 
     public partial class MainWindow : Window
     {
+        FileManager FileManager;
         public MainWindow()
         {
             InitializeComponent();
-            MenuItem root = new MenuItem() { Title = "Menu" };
-            MenuItem childItem1 = new MenuItem() { Title = "Child item #1" };
-            childItem1.Items.Add(new MenuItem() { Title = "Child item #1.1" });
-            childItem1.Items.Add(new MenuItem() { Title = "Child item #1.2" });
+            FileManager = new FileManager();
+            MenuItem root = new MenuItem(@"C:\");
+            MenuItem childItem1 = new MenuItem(@"C:\matlab");
+            childItem1.Items.Add(new MenuItem(@"C:\matlab"));
+            childItem1.Items.Add(new MenuItem(@"C:\matlab"));
             root.Items.Add(childItem1);
-            root.Items.Add(new MenuItem() { Title = "Child item #2" });
+            root.Items.Add(new MenuItem(@"C:\matlab"));
             trvMenu.Items.Add(root);
 
-
-            lb.Items.Add("aaa");
-            lb.Items.Add("bbb");
-            lb.Items.Add("ddd");
-            lb.Items.Add("ddd");
-            lb.Items.Add("aaa");
-            lb.Items.Add("bbb");
-            lb.Items.Add("ddd");
-            lb.Items.Add("ddd");
-
-
-
-            //ListViewBack.ItemsPanel = (ItemsPanelTemplate)ListViewBack.FindResource("IconGridPanelTemplate");
-            //ListViewBack.ItemTemplate = (DataTemplate)ListViewBack.FindResource("IconGridDataTemplate");
+            ListViewDirectory.ItemTemplate = (DataTemplate)ListViewDirectory.FindResource("ListViewSmallView");
+            
 
 
 
 
 
-            InitializeListView(ListView1);
-            ObservableCollection<string> List1 = new ObservableCollection<string>();
-            List1.Add("John Smith");
-            List1.Add("Michael Roth");
-            List1.Add("Anna Johnson");
-            List1.Add("James White");
-            List1.Add("Elisabeth Young");
-            List1.Add("John Smith2");
-            List1.Add("Michael Roth2");
-            List1.Add("Anna Johnson2");
-            List1.Add("James White2");
-            List1.Add("Elisabeth Young2");
-            ListView1.ItemsSource = List1;
+            //InitializeListView(ListView1);
+            //ObservableCollection<FileManagerObject> List1 = new ObservableCollection<FileManagerObject>();
+            //List1.Add(new FileObject("fefefe1"));
+            //List1.Add(new DirectoryObject("fefefe2"));
+            //List1.Add(new DirectoryObject("fefefe3"));
+            //List1.Add(new FileObject("fefefe4"));
+            //ListViewDirectory.ItemsSource = List1;
+
+            ShowDirectory(@"D:\");
         }
-        public class MenuItem
+
+        private void ShowDirectory(string path)
         {
-            public MenuItem()
+            DirectoryInfo dir = new DirectoryInfo(path);
+            if (!dir.Exists)
+                dir = FileManager.GetCurrentDirectory();
+            FileManager.SetCurrentDirectory(dir.FullName);
+
+            ObservableCollection<FileManagerObject> list = new ObservableCollection<FileManagerObject>();
+            foreach (var item in FileManager.GetFilesAndDirectories())
             {
-                this.Items = new ObservableCollection<MenuItem>();
+                if (item is DirectoryInfo)
+                    list.Add(new DirectoryObject(item as DirectoryInfo));
+                else if (item is FileInfo)
+                    list.Add(new FileObject(item as FileInfo));
             }
 
-            public string Title { get; set; }
+            ListViewDirectory.ItemsSource = list;
+        }
 
+        public class MenuItem
+        {
             public ObservableCollection<MenuItem> Items { get; set; }
+            public FileManagerObject File { get; set; }
+
+            public MenuItem(string Path)
+            {
+                this.Items = new ObservableCollection<MenuItem>();
+                this.File = new FileObject(Path);
+            }
         }
 
         #region listview drag & drop
@@ -447,6 +456,31 @@ namespace FileManagerWPF
             System.Diagnostics.Debug.WriteLine(message);
         }
         #endregion
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            ListViewDirectory.ItemTemplate = (DataTemplate)ListViewDirectory.FindResource("ListViewSmallView");
+            ListViewDirectory.ItemsPanel = (ItemsPanelTemplate)ListViewDirectory.FindResource("ListViewIconItemsPanel");
+            ListViewDirectory.View = null;
+        }
+        private void Button_Click2(object sender, RoutedEventArgs e)
+        {
+            ListViewDirectory.ItemTemplate = (DataTemplate)ListViewDirectory.FindResource("ListViewBigView");
+            ListViewDirectory.ItemsPanel = (ItemsPanelTemplate)ListViewDirectory.FindResource("ListViewIconItemsPanel");
+            ListViewDirectory.View = null;
+        }
+        private void Button_Click3(object sender, RoutedEventArgs e)
+        {
+            ListViewDirectory.ItemTemplate = (DataTemplate)ListViewDirectory.FindResource("ListViewDetailsView");
+            ListViewDirectory.ItemsPanel = (ItemsPanelTemplate)ListViewDirectory.FindResource("ListViewListItemsPanel");
+            ListViewDirectory.View = (ViewBase)ListViewDirectory.FindResource("ListViewDetailsGridView");
+        }
+        private void Button_Click4(object sender, RoutedEventArgs e)
+        {
+            ListViewDirectory.ItemTemplate = (DataTemplate)ListViewDirectory.FindResource("ListViewBigView");
+            ListViewDirectory.ItemsPanel = (ItemsPanelTemplate)ListViewDirectory.FindResource("ListViewIconItemsPanel");
+            ListViewDirectory.View = null;
+        }
     }
 
     public static class VisualTree
