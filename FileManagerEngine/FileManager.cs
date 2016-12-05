@@ -33,9 +33,10 @@ namespace FileManagerEngine
 
         public DirectoryInfo CreateDirectory(string path, string name = "Nowy folder")
         {
-            DirectoryInfo dir = new DirectoryInfo(Path.Combine(path, name));
+            DirectoryInfo dir = null;
             try
             {
+                dir = new DirectoryInfo(Path.Combine(path, name));
                 dir.Create();
             }
             catch (Exception ex)
@@ -48,9 +49,10 @@ namespace FileManagerEngine
 
         public FileInfo CreateFile(string path, string name = "Nowy plik")
         {
-            FileInfo file = new FileInfo(Path.Combine(path, name));
+            FileInfo file = null;
             try
             {
+                file = new FileInfo(Path.Combine(path, name));
                 file.Create().Dispose();
             }
             catch (Exception ex)
@@ -94,6 +96,34 @@ namespace FileManagerEngine
             }
         }
 
+        public bool CheckWritePermissions(string path)
+        {
+            try
+            {
+                using (FileStream fs = File.Create( Path.Combine(path, Path.GetRandomFileName()), 1, FileOptions.DeleteOnClose) )
+                { }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public bool CheckReadPermissions(string path)
+        {
+            try
+            {
+                var directories = Directory.GetDirectories(path);
+                var files = Directory.GetFiles(path);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public DirectoryInfo GetCurrentDirectory()
         {
             DirectoryInfo dir = null;
@@ -116,8 +146,16 @@ namespace FileManagerEngine
 
         public ObservableCollection<DirectoryInfo> GetDirectories()
         {
+            return GetDirectories(string.Empty);
+        }
+        public ObservableCollection<DirectoryInfo> GetDirectories(string path)
+        {
             ObservableCollection<DirectoryInfo> directorieslist = new ObservableCollection<DirectoryInfo>();
-            DirectoryInfo current = GetCurrentDirectory();
+            DirectoryInfo current;
+            if (string.IsNullOrEmpty(path))
+                current = GetCurrentDirectory();
+            else
+                current = new DirectoryInfo(path);
             if (!current.Exists)
                 return directorieslist;
 
@@ -128,7 +166,7 @@ namespace FileManagerEngine
             }
             catch (UnauthorizedAccessException ex)
             {
-                SetCurrentDirectory(current.Parent.FullName);
+                //SetCurrentDirectory(current.Parent.FullName);
                 if (Error != null)
                     Error(this, new ErrorEvent { Value = ex.Message });
                 return directorieslist;
@@ -237,19 +275,24 @@ namespace FileManagerEngine
 
         public void SetCurrentDirectory(string directoryPath)
         {
-            DirectoryInfo dir = new DirectoryInfo(directoryPath);
-            if (dir.Exists)
+            try
             {
-                try
+                DirectoryInfo dir = new DirectoryInfo(directoryPath);
+                if (dir.Exists)
                 {
                     Directory.SetCurrentDirectory(dir.FullName);
                     history.AddDirectory(dir);
+
+
                 }
-                catch (Exception ex)
-                {
+                else
                     if (Error != null)
-                        Error(this, new ErrorEvent { Value = ex.Message });
-                }
+                    Error(this, new ErrorEvent { Value = String.Format("Nie znaleziono '{0}", directoryPath) });
+            }
+            catch (Exception ex)
+            {
+                if (Error != null)
+                    Error(this, new ErrorEvent { Value = ex.Message });
             }
         }
     }

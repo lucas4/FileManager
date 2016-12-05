@@ -17,19 +17,22 @@ namespace FileManagerEngine
         /// Event occurs when we detect a change in drives.
         /// </summary>
         public static EventHandler OnDriveFound { get; set; }
+        private static readonly Destructor Finalise;
 
         static DriveManager()
         {
+            Finalise = new Destructor();
             Disks = new Dictionary<String, DriveInfo>();
             
             watcher = new ManagementEventWatcher();
             watcher.Query = new WqlEventQuery("SELECT * FROM Win32_VolumeChangeEvent WHERE EventType = 2 or EventType = 3");
             watcher.EventArrived += new EventArrivedEventHandler(DriveFoundEvent);
             watcher.Start();
+            watcher.Stop();
             
             RefreshDrives();
         }
-        
+
         private static void RefreshDrives()
         {
             Disks.Clear();
@@ -70,6 +73,18 @@ namespace FileManagerEngine
                 return Disks[name];
             else
                 return null;
+        }
+        public static Dictionary<string, DriveInfo> GetDrives()
+        {
+            return Disks;
+        }
+        
+        private sealed class Destructor
+        {
+            ~Destructor()
+            {
+                watcher.Stop();
+            }
         }
     }
 }

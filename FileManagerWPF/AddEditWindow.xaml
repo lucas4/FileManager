@@ -1,0 +1,33 @@
+﻿<Window x:Class="FileManagerWPF.AddEditWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FileManagerWPF"
+        mc:Ignorable="d" 
+        WindowStartupLocation="CenterScreen"
+        Title="Nowy plik" 
+        ResizeMode="NoResize"
+        Width="350"
+        Height="150">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" VerticalAlignment="Center">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <TextBlock Grid.Column="0" Height="21" VerticalAlignment="Center" Text="Podaj nazwę:" Margin="20,0,0,0" />
+            <TextBox Grid.Column="1" Height="21" x:Name="FileNameTextBox" VerticalContentAlignment="Center" VerticalAlignment="Stretch" Margin="8,0,20,0" />
+        </Grid>
+        <Border Grid.Row="1" Background="#f2f2f2" BorderBrush="#DADADA" BorderThickness="0,1,0,0" >
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button Click="ButtonSave_Click" BorderBrush="#B6B6B6" Margin="9" Padding="12,3,12,3" Content="Zapisz" />
+                <Button Click="ButtonClose_Click" BorderBrush="#B6B6B6"  Margin="9" Padding="12,3,12,3" Content="Anuluj" />
+            </StackPanel>
+        </Border>
+    </Grid>
+</Window>

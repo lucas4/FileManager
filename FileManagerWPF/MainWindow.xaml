@@ -5,131 +5,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:FileManagerWPF"
         mc:Ignorable="d"
-        Title="MainWindow" Height="550" Width="900">
+        WindowStartupLocation="CenterScreen"
+        Title="MainWindow" Height="650" Width="1200">
     <Window.Resources>
-        <DataTemplate x:Key="ListViewBigView">
-            <WrapPanel Orientation="Vertical" Width="48">
-                <Image Width="48" Height="48" Stretch="Fill" Source="{Binding Image}" />
-                <TextBlock MaxHeight="46" LineHeight="15" LineStackingStrategy="BlockLineHeight" TextTrimming="CharacterEllipsis" TextWrapping="Wrap" Text="{Binding File.Name}" HorizontalAlignment="Center" />
-            </WrapPanel>
-        </DataTemplate>
-        <DataTemplate x:Key="ListViewSmallView">
-            <WrapPanel Orientation="Horizontal" Height="24" Width="180">
-                <Image Width="24" Height="24" Stretch="Fill" Source="{Binding Image}" Margin="0,0,5,0"/>
-                <TextBlock MaxWidth="150" TextTrimming="CharacterEllipsis" Text="{Binding File.Name}" VerticalAlignment="Center" />
-            </WrapPanel>
-        </DataTemplate>
-        <DataTemplate x:Key="ListViewDetailsView">
-            <UniformGrid Columns="2">
-                <StackPanel>
-                    <Image Width="24" Height="24" Stretch="Fill" Source="{Binding Image}" Margin="0,0,5,0"/>
-                    <TextBlock MaxWidth="30" TextTrimming="CharacterEllipsis" Text="efef" />
-                </StackPanel>
-                <TextBlock MaxWidth="30" TextTrimming="CharacterEllipsis" Text="efef" />
-                <TextBlock MaxWidth="30" TextTrimming="CharacterEllipsis" Text="{Binding File.Name}" />
-            </UniformGrid>
-        </DataTemplate>
-        <ItemsPanelTemplate x:Key="ListViewListItemsPanel">
-            <StackPanel Orientation="Vertical" />
-        </ItemsPanelTemplate>
-        <ItemsPanelTemplate x:Key="ListViewIconItemsPanel">
-            <WrapPanel IsItemsHost="True" Orientation="Horizontal" />
-        </ItemsPanelTemplate>
-        <GridView x:Key="ListViewDetailsGridView">
-            <GridViewColumn Width="250" Header="Nazwa">
-                <GridViewColumn.CellTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
-                            <Image Width="18" Height="18" Stretch="Fill" Source="{Binding Image}" Margin="0,0,5,0"/>
-                            <TextBlock TextTrimming="CharacterEllipsis" Foreground="Black" Text="{Binding File.Name}" />
-                        </StackPanel>
-                    </DataTemplate>
-                </GridViewColumn.CellTemplate>
-            </GridViewColumn>
-            <GridViewColumn Width="120" Header="Data modyfikacji">
-                <GridViewColumn.CellTemplate>
-                    <DataTemplate>
-                        <TextBlock Foreground="Black" Text="{Binding File.LastWriteTime, StringFormat='dd.MM.yyy HH:mm'}" />
-                    </DataTemplate>
-                </GridViewColumn.CellTemplate>
-            </GridViewColumn>
-            <GridViewColumn Width="100" Header="Rozmiar">
-                <GridViewColumn.CellTemplate>
-                    <DataTemplate>
-                        <TextBlock Foreground="Black" Text="{Binding File.Length, StringFormat='{}{0} KB'}" />
-                    </DataTemplate>
-                </GridViewColumn.CellTemplate>
-            </GridViewColumn>
-        </GridView>
-        <Style x:Key="BigButtonStyle" TargetType="{x:Type Button}">
-            <Setter Property="Margin" Value="1" />
-            <Setter Property="Background" Value="White" />
-            <Setter Property="BorderThickness" Value="1" />
-
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Button}">
-                        <Border x:Name="ButtonBorder" Padding="4" CornerRadius="0" BorderThickness="1" Background="{TemplateBinding Background}">
-                            <StackPanel>
-                                <Image Height="30" Width="30" Source="{TemplateBinding Tag}" />
-                                <ContentPresenter x:Name="MyContentPresenter" Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,0" />
-                            </StackPanel>
-                        </Border>
-
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#ccf3ff" />
-                                <Setter TargetName="ButtonBorder" Property="Border.BorderBrush" Value="#00bfff" />
-                            </Trigger>
-
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter Property="Background" Value="#99e7ff" />
-                                <Setter TargetName="ButtonBorder" Property="Border.BorderBrush" Value="#0099ff" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <Style x:Key="MediumButtonStyle" TargetType="{x:Type Button}">
-            <Setter Property="Margin" Value="1" />
-            <Setter Property="Background" Value="White" />
-            <Setter Property="BorderThickness" Value="1" />
-
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type Button}">
-                        <Border x:Name="ButtonBorder" CornerRadius="0" Padding="2" BorderThickness="1" Background="{TemplateBinding Background}">
-                            <StackPanel Orientation="Horizontal">
-                                <Image Height="16" Width="16" Source="{TemplateBinding Tag}" Margin="0,0,3,0" />
-                                <ContentPresenter x:Name="MyContentPresenter" Content="{TemplateBinding Content}" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,0" />
-                            </StackPanel>
-                        </Border>
-
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter Property="Background" Value="#ccf3ff" />
-                                <Setter TargetName="ButtonBorder" Property="Border.BorderBrush" Value="#00bfff" />
-                            </Trigger>
-
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter Property="Background" Value="#99e7ff" />
-                                <Setter TargetName="ButtonBorder" Property="Border.BorderBrush" Value="#0099ff" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-        <BitmapImage x:Key="IconCancel" UriSource="/Images/Icons/Cancel.png" />
-        <BitmapImage x:Key="IconAddFolder" UriSource="/Images/Icons/Add-Folder.png" />
-        <BitmapImage x:Key="IconAddFile" UriSource="/Images/Icons/Add-File.png" />
-        <BitmapImage x:Key="IconEditFile" UriSource="/Images/Icons/Edit-File.png" />
-        <BitmapImage x:Key="IconDelete" UriSource="/Images/Icons/Delete.png" />
-        <BitmapImage x:Key="IconWindowsClient" UriSource="/Images/Icons/Windows-Client.png" />
-        <BitmapImage x:Key="IconList" UriSource="/Images/Icons/List.png" />
-        <BitmapImage x:Key="IconSmallIcons" UriSource="/Images/Icons/Small-Icons.png" />
-        <BitmapImage x:Key="IconMediumIcons" UriSource="/Images/Icons/Medium-Icons.png" />
+        <local:TreeViewMarginConverter x:Key="TreeViewMarginConverter" />
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
     </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
@@ -139,110 +19,102 @@
         <Grid x:Name="MenuGrid" Grid.Row="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
+                <RowDefinition Height="5" />
                 <RowDefinition Height="*" />
+                <RowDefinition Height="5" />
             </Grid.RowDefinitions>
-            <StackPanel Grid.Row="0" Orientation="Horizontal">
-                <Border BorderThickness="0,0,1,0" BorderBrush="#e6e6e6" Padding="5">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="3" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <Button Grid.Row="0" Content="Ten Komputer" Style="{StaticResource BigButtonStyle}" Tag="{StaticResource IconWindowsClient}" />
-                        <TextBlock Grid.Row="2" Text="Miejsca" HorizontalAlignment="Center" Foreground="#808080" />
-                    </Grid>
-                </Border>
-                <!--<Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="*" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-                    <StackPanel Grid.Row="0">
-                        <Button Content="Nowy plik" Style="{StaticResource BigButtonStyle}" Tag="{StaticResource IconAddFile}" />
-                        <Button Content="Nowy folder" Style="{StaticResource BigButtonStyle}" Tag="{StaticResource IconAddFolder}" />
-                        <Button Content="Zmień nazwę" Style="{StaticResource BigButtonStyle}" Tag="{StaticResource IconEditFile}"/>
-                        <Button Content="Usuń" Style="{StaticResource BigButtonStyle}" Tag="{StaticResource IconDelete}" />
-                    </StackPanel>
-                    <TextBlock Grid.Row="1" Text="Narzędzia" HorizontalAlignment="Center" />
-                </Grid>-->
-                <Border BorderThickness="0,0,1,0" BorderBrush="#e6e6e6" Padding="5">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="3" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <StackPanel Orientation="Horizontal">
-                            <Button Content="Nowy plik" Style="{StaticResource BigButtonStyle}" Tag="{StaticResource IconAddFile}" />
-                            <Button Content="Nowy folder" Style="{StaticResource BigButtonStyle}" Tag="{StaticResource IconAddFolder}" />
-                            <Button Content="Zmień nazwę" Style="{StaticResource BigButtonStyle}" Tag="{StaticResource IconEditFile}"/>
-                            <Button Content="Usuń" Style="{StaticResource BigButtonStyle}" Tag="{StaticResource IconDelete}" />
-                        </StackPanel>
-                        <TextBlock Grid.Row="2" Text="Narzędzia" HorizontalAlignment="Center" Foreground="#808080" />
-                    </Grid>
-                </Border>
-                <Border BorderThickness="0,0,1,0" BorderBrush="#e6e6e6" Padding="5">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="3" />
-                            <RowDefinition Height="Auto" />
-                        </Grid.RowDefinitions>
-                        <StackPanel Grid.Row="0">
-                            <Button Content="Średnie ikony" Style="{StaticResource MediumButtonStyle}" Tag="{StaticResource IconMediumIcons}" Click="Button_Click2" />
-                            <Button Content="Małe ikony" Style="{StaticResource MediumButtonStyle}" Tag="{StaticResource IconSmallIcons}" Click="Button_Click" />
-                            <Button Content="Lista szczegółowa" Style="{StaticResource MediumButtonStyle}" Tag="{StaticResource IconList}" Click="Button_Click3" />
-                        </StackPanel>
-                        <TextBlock Grid.Row="2" Text="Widoki" HorizontalAlignment="Center" Foreground="#808080" />
-                    </Grid>
-                </Border>
-            </StackPanel>
-            <!--<Menu Grid.Row="0" IsMainMenu="True">
-                <MenuItem Header="_File" />
-                <MenuItem Header="_Edit" />
-                <MenuItem Header="_View" />
-                <MenuItem Header="_Window" />
-                <MenuItem Header="_Help" />
-            </Menu>-->
-            <Grid Grid.Row="1" Height="20">
+            <Border Grid.Row="0" BorderThickness="0,0,0,1" BorderBrush="#e6e6e6">
+                <StackPanel Orientation="Horizontal">
+                    <!--<Border BorderThickness="0,0,1,0" BorderBrush="#e6e6e6" Padding="5">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="3" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Button Grid.Row="0" Content="Ten Komputer" Style="{StaticResource BigButtonStyle}" Tag="{StaticResource IconWindowsClient}" />
+                            <TextBlock Grid.Row="2" Text="Miejsca" HorizontalAlignment="Center" Foreground="#808080" />
+                        </Grid>
+                    </Border>-->
+
+                    <Border BorderThickness="0,0,1,0" BorderBrush="#e6e6e6" Padding="5">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="3" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="Nowy plik" Click="ButtonCreateFile_Click" Style="{StaticResource BigButtonStyle}" Tag="{StaticResource IconAddFile}" />
+                                <Button Content="Nowy folder" Click="ButtonCreateDirectory_Click" Style="{StaticResource BigButtonStyle}" Tag="{StaticResource IconAddFolder}" />
+                                <Button Content="Zmień nazwę" Click="ButtonRename_Click" Style="{StaticResource BigButtonStyle}" Tag="{StaticResource IconEditFile}"/>
+                                <Button Content="Usuń" Click="ButtonDelete_Click" Style="{StaticResource BigButtonStyle}" Tag="{StaticResource IconDelete}" />
+                            </StackPanel>
+                            <TextBlock Grid.Row="2" Text="Narzędzia" HorizontalAlignment="Center" Foreground="#808080" />
+                        </Grid>
+                    </Border>
+                    <Border BorderThickness="0,0,1,0" BorderBrush="#e6e6e6" Padding="5">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="3" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <StackPanel Grid.Row="0">
+                                <Button Content="Średnie ikony" Style="{StaticResource MediumButtonStyle}" Tag="{StaticResource IconMediumIcons}" Click="Button_Click2" />
+                                <Button Content="Małe ikony" Style="{StaticResource MediumButtonStyle}" Tag="{StaticResource IconSmallIcons}" Click="Button_Click" />
+                                <Button Content="Lista szczegółowa" Style="{StaticResource MediumButtonStyle}" Tag="{StaticResource IconList}" Click="Button_Click3" />
+                            </StackPanel>
+                            <TextBlock Grid.Row="2" Text="Widoki" HorizontalAlignment="Center" Foreground="#808080" />
+                        </Grid>
+                    </Border>
+                </StackPanel>
+            </Border>
+            <Grid Grid.Row="2" Height="22">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="80" />
+                    <ColumnDefinition Width="auto" />
                     <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="auto" />
                 </Grid.ColumnDefinitions>
                 <StackPanel Grid.Column="0" Orientation="Horizontal">
-                    <Button Content="&#60;" Width="20" />
-                    <Button Content="&#62;" Width="20" />
-                    <Button Content="\/" Width="20" />
-                    <Button Content="/\" Width="20" />
+                    <Button Margin="5,0,1,0" Style="{StaticResource SmallButtonStyle}" x:Name="ButtonBack" Tag="{StaticResource IconBack}" Click="ButtonBack_Click"/>
+                    <Button Margin="1,0,1,0" Style="{StaticResource SmallButtonStyle}" x:Name="ButtonForward" Tag="{StaticResource IconForward}" Click="ButtonForward_Click" />
+                    <Button Margin="1,0,1,0" Style="{StaticResource SmallButtonStyle}" x:Name="ButtonUp" Tag="{StaticResource IconCollapseArrow}" Click="ButtonUp_Click" />
                 </StackPanel>
-                <TextBox x:Name="AddressTextBox" Grid.Column="1" Text="adres" HorizontalAlignment="Stretch" />
+                <TextBox Grid.Column="1" x:Name="AddressTextBox" Text="" KeyUp="AddressTextBox_KeyUp" Keyboard.LostKeyboardFocus="AddressTextBox_LostKeyboardFocus" Style="{StaticResource AddressTextBox}" />
+                <Button Grid.Column="2" Margin="1,0,5,0" Click="ButtonRefresh_Click" Style="{StaticResource SmallButtonStyle}" Tag="{StaticResource IconSynchronize}" />
             </Grid>
         </Grid>
         <Grid Grid.Row="1">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="150" />
-                <ColumnDefinition Width="5" />
+                <ColumnDefinition Width="180" />
+                <ColumnDefinition Width="auto" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <GridSplitter Grid.Column="1" Width="5" VerticalAlignment="Stretch" />
-            <Grid Grid.Column="0">
-                <TreeView Name="trvMenu" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-                    <TreeView.ItemTemplate>
-                        <HierarchicalDataTemplate DataType="{x:Type MenuItem}" ItemsSource="{Binding Items}">
-                            <StackPanel Orientation="Horizontal">
-                                <Image Height="30" Width="30" Source="{Binding File.Image}" />
-                                <TextBlock Text="{Binding File.Name}" />
-                            </StackPanel>
-                        </HierarchicalDataTemplate>
-                    </TreeView.ItemTemplate>
-                </TreeView>
-            </Grid>
+            <GridSplitter Grid.Column="1" Width="5" VerticalAlignment="Stretch" HorizontalAlignment="Center"/>
+            <TreeView Grid.Column="0" Name="trvMenu" Margin="5" TreeViewItem.Expanded="TreeViewItem_Expanded" TreeView.SelectedItemChanged="TreeView_SelectedItemChanged"  ScrollViewer.HorizontalScrollBarVisibility="Disabled" ScrollViewer.CanContentScroll="False">
+                <TreeView.ItemTemplate>
+                    <HierarchicalDataTemplate DataType="{x:Type MenuItem}" ItemsSource="{Binding Path=Items}">
+                        <StackPanel Orientation="Horizontal">
+                            <Image Source="{Binding Path=Image}" 
+                                   Margin="0,1,8,1"
+                                   Height="18"
+                                   Width="19"
+                                   />
+                            <TextBlock
+                            Text="{Binding Path=Name}"
+                            VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </HierarchicalDataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
             <ListView x:Name="ListViewDirectory" 
                       Grid.Column="2" 
-                      SelectionMode="Extended"
+                      MouseDoubleClick="ListViewDirectory_MouseDoubleClick"
+                      SelectionMode="Single"
                       ItemsPanel="{StaticResource ListViewIconItemsPanel}" 
-                      ItemTemplate="{StaticResource ListViewBigView}" 
+                      ItemTemplate="{StaticResource ListViewBigView}"  
+                      HorizontalAlignment="Stretch"
                       VerticalContentAlignment="Top" 
                       ScrollViewer.HorizontalScrollBarVisibility="Disabled" />
         </Grid>

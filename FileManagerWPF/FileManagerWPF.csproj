@@ -55,10 +55,22 @@
     <ApplicationDefinition Include="App.xaml">
       <Generator>MSBuild:Compile</Generator>
     </ApplicationDefinition>
+    <Resource Include="Styles.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Page Include="AddEditWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
+    <Compile Include="AddEditWindow.xaml.cs">
+      <DependentUpon>AddEditWindow.xaml</DependentUpon>
+    </Compile>
     <Compile Include="App.xaml.cs">
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
@@ -271,10 +283,6 @@
     <Resource Include="Images\Icons\Synchronize.png" />
     <Resource Include="Images\Icons\TAR.png" />
     <Resource Include="Images\Icons\Top Menu.png" />
-    <Resource Include="Images\Icons\USB Connected.png" />
-    <Resource Include="Images\Icons\USB Disconnected.png" />
-    <Resource Include="Images\Icons\USB Off.png" />
-    <Resource Include="Images\Icons\USB On.png" />
     <Resource Include="Images\Icons\Wi-Fi.png" />
     <Resource Include="Images\Icons\Windows-Client.png" />
     <Resource Include="Images\Icons\Windows-Logo.png" />
@@ -290,6 +298,21 @@
   </ItemGroup>
   <ItemGroup>
     <Resource Include="Images\Icons\Small-Icons.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Icons\USB2.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Icons\Question-Mark.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Icons\USB-Connected.png" />
+    <Resource Include="Images\Icons\USB-Disconnected.png" />
+    <Resource Include="Images\Icons\USB-Off.png" />
+    <Resource Include="Images\Icons\USB-On.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\Icons\Rename.png" />
   </ItemGroup>
   <Import Project="..\FileManagerEngine\FileManagerEngine.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -4,6 +4,13 @@
              xmlns:local="clr-namespace:FileManagerWPF"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary>
+                    <local:TreeViewMarginConverter x:Key="TreeViewMarginConverter"></local:TreeViewMarginConverter>
+                </ResourceDictionary>
+                <ResourceDictionary Source="Styles.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
     </Application.Resources>
 </Application>

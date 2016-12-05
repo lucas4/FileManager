@@ -17,6 +17,8 @@ using System.Windows.Shapes;
 using FileManagerEngine;
 using System.IO;
 using System.Management;
+using System.ComponentModel;
+using System.Globalization;
 
 namespace FileManagerWPF
 {
@@ -24,7 +26,6 @@ namespace FileManagerWPF
     /// Interaction logic for MainWindow.xaml
     /// </summary>
     /// 
-
     public partial class MainWindow : Window
     {
         FileManager FileManager;
@@ -32,30 +33,72 @@ namespace FileManagerWPF
         {
             InitializeComponent();
             FileManager = new FileManager();
-            MenuItem root = new MenuItem(@"C:\");
-            MenuItem childItem1 = new MenuItem(@"C:\matlab");
-            childItem1.Items.Add(new MenuItem(@"C:\matlab"));
-            childItem1.Items.Add(new MenuItem(@"C:\matlab"));
-            root.Items.Add(childItem1);
-            root.Items.Add(new MenuItem(@"C:\matlab"));
-            trvMenu.Items.Add(root);
-
             ListViewDirectory.ItemTemplate = (DataTemplate)ListViewDirectory.FindResource("ListViewSmallView");
-            
+            FileManager.Error += ShowError;
+            ShowTreeDisks();
 
+            SetDirectory(@"C:\");
+        }
 
+        private void SetDirectory(string path)
+        {
+            try
+            {
+                if (FileManager.CheckReadPermissions(path))
+                {
+                    FileManager.SetCurrentDirectory(path);
+                    ShowDirectory();
+                    SetAddresBoxText();
+                    EnableButton();
+                }
+                else
+                {
+                    ShowError(this, new ErrorEvent() { Value = string.Format("Odmowa dostępu do {0}.", path) });
+                }
+            } catch { }
+        }
 
+        private void ShowError(object sender, ErrorEvent e)
+        {
+            MessageBox.Show(e.Value, "Błąd", MessageBoxButton.OK, MessageBoxImage.Error, MessageBoxResult.OK);
+            AddressTextBox.Focus();
+        }
 
+        private void ShowTreeDisks()
+        {
+            ComputerMenuItem comp = new ComputerMenuItem();
+            //trvMenu.Items.Add(comp);
+            Dictionary<string, DriveInfo> disks = DriveManager.GetDrives();
+            foreach (var item in disks)
+            {
+                ShowTreeItems(item.Key);
+            }
+        }
 
-            //InitializeListView(ListView1);
-            //ObservableCollection<FileManagerObject> List1 = new ObservableCollection<FileManagerObject>();
-            //List1.Add(new FileObject("fefefe1"));
-            //List1.Add(new DirectoryObject("fefefe2"));
-            //List1.Add(new DirectoryObject("fefefe3"));
-            //List1.Add(new FileObject("fefefe4"));
-            //ListViewDirectory.ItemsSource = List1;
-
-            ShowDirectory(@"D:\");
+        private void ShowTreeItems(string path, ObservableCollection<MenuItem> items = null)
+        {
+            MenuItem root = new MenuItem(path);
+            ObservableCollection<DirectoryInfo> dirlist = FileManager.GetDirectories(root.Path);
+            if (items != null)
+                foreach (var item in dirlist)
+                {
+                    MenuItem dir = new MenuItem(item.FullName);
+                    items.Add(dir);
+                }
+            else
+            {
+                foreach (var item in dirlist)
+                {
+                    MenuItem dir = new MenuItem(item.FullName);
+                    root.Items.Add(dir);
+                }
+                trvMenu.Items.Add(root);
+            }
+        }
+        
+        private void ShowDirectory()
+        {
+            ShowDirectory(FileManager.GetCurrentDirectory().FullName);
         }
 
         private void ShowDirectory(string path)
@@ -63,7 +106,6 @@ namespace FileManagerWPF
             DirectoryInfo dir = new DirectoryInfo(path);
             if (!dir.Exists)
                 dir = FileManager.GetCurrentDirectory();
-            FileManager.SetCurrentDirectory(dir.FullName);
 
             ObservableCollection<FileManagerObject> list = new ObservableCollection<FileManagerObject>();
             foreach (var item in FileManager.GetFilesAndDirectories())
@@ -77,386 +119,38 @@ namespace FileManagerWPF
             ListViewDirectory.ItemsSource = list;
         }
 
-        public class MenuItem
+        private void TreeViewItem_Expanded(object sender, RoutedEventArgs e)
         {
-            public ObservableCollection<MenuItem> Items { get; set; }
-            public FileManagerObject File { get; set; }
-
-            public MenuItem(string Path)
+            MenuItem item = (e.OriginalSource as TreeViewItem).DataContext as MenuItem;
+            if (item != null && (item.HasItems && item.Items.Count == 0))
             {
-                this.Items = new ObservableCollection<MenuItem>();
-                this.File = new FileObject(Path);
+                ShowTreeItems(item.Path, item.Items);
             }
         }
 
-        #region listview drag & drop
-        void InitializeListView(ListView listView)
-
+        private void TreeView_SelectedItemChanged(object sender, RoutedPropertyChangedEventArgs<object> e)
         {
-
-            listView.AllowDrop = true;
-
-            listView.PreviewMouseDown += new MouseButtonEventHandler(listView_PreviewMouseDown);
-            listView.PreviewMouseUp += new MouseButtonEventHandler(listView_PreviewMouseUp);
-            listView.PreviewMouseMove += new MouseEventHandler(listView_PreviewMouseMove);
-            listView.LostMouseCapture += new MouseEventHandler(listView_LostMouseCapture);
-            listView.DragEnter += new DragEventHandler(listView_DragEnter);
-            listView.DragOver += new DragEventHandler(listView_DragOver);
-            listView.Drop += new DragEventHandler(listView_Drop);
-        }
-        
-        #region Data operations
-        
-        void SaveData(IList source, IDataObject target)
-        {
-            string Buffer = "";
-            foreach (object Item in source)
-                Buffer += (Buffer == "" ? "" : "\r\n") + "" + Item;
-            target.SetData(typeof(string), Buffer);
-        }
-        
-        bool CanLoadData(IDataObject source)
-        {
-            return source.GetDataPresent(typeof(string));
-        }
-
-        void LoadData(IDataObject source, ListView listView)
-        {
-            IList target = listView.ItemsSource as IList;
-            if (target == null)
-                return;
-            string Buffer = (string)source.GetData(typeof(string));
-            string[] Separators = new string[] { "\r\n" };
-            string[] Items = Buffer.Split(Separators, StringSplitOptions.RemoveEmptyEntries);
-
-            foreach (string Item in Items)
-                if (!target.Contains(Item))
-                    target.Add(Item);
-        }
-        
-        #endregion
-
-        #region Drop operations
-
-        void MakeDropEffect(DragEventArgs e)
-        {
-            if (!CanLoadData(e.Data))
-                e.Effects = DragDropEffects.None;
-            else if ((e.KeyStates & DragDropKeyStates.AltKey) == DragDropKeyStates.AltKey)
-                e.Effects = DragDropEffects.None;
-            else
+            MenuItem item = e.NewValue as MenuItem;
+            if (item != null)
             {
-                if ((e.KeyStates & DragDropKeyStates.ControlKey) == DragDropKeyStates.ControlKey)
-                {
-                    if ((e.AllowedEffects & DragDropEffects.Copy) == DragDropEffects.Copy)
-                    {
-                        e.Effects = DragDropEffects.Copy;
-                        return;
-                    }
-                }
-                if ((e.KeyStates & DragDropKeyStates.ShiftKey) == DragDropKeyStates.ShiftKey)
-                {
-                    if ((e.AllowedEffects & DragDropEffects.Move) == DragDropEffects.Move)
-                    {
-                        e.Effects = DragDropEffects.Move;
-                        return;
-                    }
-                }
-
-                if ((e.AllowedEffects & DragDropEffects.Move) == DragDropEffects.Move)
-
-                {
-
-                    e.Effects = DragDropEffects.Move;
-
-                    return;
-
-                }
-
-                if ((e.AllowedEffects & DragDropEffects.Copy) == DragDropEffects.Copy)
-
-                {
-
-                    e.Effects = DragDropEffects.Copy;
-
-                    return;
-
-                }
-
-                e.Effects = DragDropEffects.None;
-
+                SetDirectory(item.Path);
             }
-
         }
-
-
-
-        void listView_DragEnter(object sender, DragEventArgs e)
-
+        
+        #region address box
+        
+        private void SetAddresBoxText()
         {
-
-            e.Handled = true;
-
-            MakeDropEffect(e);
-
+            AddressTextBox.Text = FileManager.GetCurrentDirectory().FullName;
         }
 
-
-
-        void listView_DragOver(object sender, DragEventArgs e)
-
+        private void SetAddresBoxText(string text)
         {
-
-            listView_DragEnter(sender, e);
-
+            AddressTextBox.Text = text;
         }
-
-
-
-        void listView_Drop(object sender, DragEventArgs e)
-
-        {
-
-            ListView listView = (ListView)sender;
-
-            e.Handled = true;
-
-            MakeDropEffect(e);
-
-            if (e.Effects == DragDropEffects.Copy || e.Effects == DragDropEffects.Move)
-
-                LoadData(e.Data, listView);
-
-        }
-
-
 
         #endregion
         
-        #region Drag start operation
-
-
-
-        void StartDrag(ListView listView)
-
-        {
-
-            IList Selection = listView.SelectedItems;
-
-            if (Selection.Count == 0)
-
-                return;
-
-
-
-            DataObject Buffer = new DataObject();
-
-            SaveData(Selection, Buffer);
-
-
-
-            DragDropEffects Result = DragDrop.DoDragDrop(listView, Buffer,
-
-            DragDropEffects.Copy | DragDropEffects.Move);
-
-            if (Result == DragDropEffects.Move)
-
-            {
-
-                IList Source = (IList)listView.ItemsSource;
-
-                object[] DeletedItems = new object[Selection.Count];
-
-                Selection.CopyTo(DeletedItems, 0);
-
-                foreach (object Item in DeletedItems)
-
-                    if (Source.Contains(Item))
-
-                        Source.Remove(Item);
-
-            }
-
-        }
-
-
-
-        #endregion
-        
-        #region Mouse events handling for both multiple selection and drag start
-
-
-
-        void listView_LostMouseCapture(object sender, MouseEventArgs e)
-
-        {
-
-            Log("LostMouseCapture()");
-
-            ListView listView = (ListView)sender;
-
-            listView.Tag = null;
-
-        }
-
-
-
-        void listView_PreviewMouseMove(object sender, MouseEventArgs e)
-
-        {
-
-            ListView listView = (ListView)sender;
-
-            if (!listView.IsMouseCaptured)
-
-                return;
-
-
-
-            e.Handled = true;
-
-
-
-            Point P = e.GetPosition(listView);
-
-            Log("" + PP.X + "/" + PP.Y + " - " + P.X + "/" + P.Y);
-
-
-
-            int Limit = 4;
-
-            if (P.X - Limit > PP.X ||
-
-            P.X + Limit < PP.X ||
-
-            P.Y - Limit > PP.Y ||
-
-            P.Y + Limit < PP.Y)
-
-            {
-
-                listView.ReleaseMouseCapture();
-
-                StartDrag(listView);
-
-            }
-
-        }
-
-
-
-        Point PP; // Mouse position for last PreviewMouseDown event
-
-
-
-        void listView_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-
-        {
-
-            Log("PreviewMouseDown()");
-
-            ListView listView = (ListView)sender;
-
-            listView.Tag = null;
-
-
-
-            PP = e.GetPosition(listView);
-
-
-
-            ListViewItem Item = (ListViewItem)VisualTree.GetParent(
-
-            e.OriginalSource, typeof(ListViewItem));
-
-            if (Item == null)
-
-                return;
-
-
-
-            if (Item.IsSelected && listView.CaptureMouse())
-
-            {
-
-                Log("PreviewMouseDown() - Selected item mouse down.");
-
-                e.Handled = true;
-
-                listView.Tag = Item;
-
-            }
-
-        }
-
-
-
-        void listView_PreviewMouseUp(object sender, MouseButtonEventArgs e)
-
-        {
-
-            Log("PreviewMouseUp()");
-
-            ListView listView = (ListView)sender;
-
-
-
-            ListViewItem Item = (ListViewItem)listView.Tag;
-
-            listView.Tag = null;
-
-            if (Item == null)
-
-                return;
-
-
-
-            if (!listView.IsMouseCaptured)
-
-                return;
-
-
-
-            e.Handled = true;
-
-            listView.ReleaseMouseCapture();
-
-
-
-            Log("PreviewMouseUp(): Item = " + Item);
-
-            if (Keyboard.IsKeyDown(Key.LeftCtrl) || Keyboard.IsKeyDown(Key.RightCtrl))
-
-                Item.IsSelected = !Item.IsSelected;
-
-            else
-
-            {
-
-                listView.SelectedItems.Clear();
-
-                Item.IsSelected = true;
-
-            }
-
-
-
-            if (!Item.IsKeyboardFocused)
-
-                Item.Focus();
-
-        }
-
-
-
-        #endregion
-        
-        void Log(object message)
-        {
-            System.Diagnostics.Debug.WriteLine(message);
-        }
-        #endregion
-
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             ListViewDirectory.ItemTemplate = (DataTemplate)ListViewDirectory.FindResource("ListViewSmallView");
@@ -480,6 +174,158 @@ namespace FileManagerWPF
             ListViewDirectory.ItemTemplate = (DataTemplate)ListViewDirectory.FindResource("ListViewBigView");
             ListViewDirectory.ItemsPanel = (ItemsPanelTemplate)ListViewDirectory.FindResource("ListViewIconItemsPanel");
             ListViewDirectory.View = null;
+        }
+
+        private void AddressTextBox_KeyUp(object sender, KeyEventArgs e)
+        {
+            switch (e.Key)
+            {
+                case Key.Escape:
+                    SetAddresBoxText(FileManager.GetCurrentDirectory().FullName);
+                    ListViewDirectory.Focus();
+                    break;
+                case Key.Enter:
+                    SetDirectory(AddressTextBox.Text);
+                    ListViewDirectory.Focus();
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        private void AddressTextBox_LostKeyboardFocus(object sender, KeyboardFocusChangedEventArgs e)
+        {
+            SetAddresBoxText(FileManager.GetCurrentDirectory().FullName);
+        }
+
+        private void ButtonRefresh_Click(object sender, RoutedEventArgs e)
+        {
+            SetDirectory(FileManager.GetCurrentDirectory().FullName);
+        }
+
+        private void ListViewDirectory_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+        {
+            var item = ListViewDirectory.SelectedItem;
+            if (item != null)
+            {
+                if (item is DirectoryObject)
+                    SetDirectory((item as DirectoryObject).File.FullName);
+                else if (item is FileObject)
+                {
+
+                }
+            }
+        }
+
+        private void EnableButton()
+        {
+            ButtonBack.IsEnabled = FileManager.CanDirectoryGoBack() ? true : false;
+            ButtonForward.IsEnabled = FileManager.CanDirectoryGoForward() ? true : false;
+            ButtonUp.IsEnabled = FileManager.CanDirectoryGoUp() ? true : false;
+        }
+
+        private void ButtonBack_Click(object sender, RoutedEventArgs e)
+        {
+            if (FileManager.CanDirectoryGoBack())
+            {
+                FileManager.DirectoryGoBack();
+                SetDirectory(FileManager.GetCurrentDirectory().FullName);
+            }
+        }
+
+        private void ButtonForward_Click(object sender, RoutedEventArgs e)
+        {
+            if (FileManager.CanDirectoryGoForward())
+            {
+                FileManager.DirectoryGoForward();
+                SetDirectory(FileManager.GetCurrentDirectory().FullName);
+            }
+        }
+
+        private void ButtonUp_Click(object sender, RoutedEventArgs e)
+        {
+            if (FileManager.CanDirectoryGoUp())
+            {
+                FileManager.DirectoryGoUp();
+                SetDirectory(FileManager.GetCurrentDirectory().FullName);
+            }
+        }
+
+        private void ButtonCreateFile_Click(object sender, RoutedEventArgs e)
+        {
+            AddEditWindow window = new AddEditWindow(0, FileManager.GetCurrentDirectory().FullName);
+            window.Closed += (sender2, e2) =>
+            {
+                ButtonRefresh_Click(this, e);
+            };
+            window.ShowDialog();
+        }
+
+        private void ButtonCreateDirectory_Click(object sender, RoutedEventArgs e)
+        {
+            AddEditWindow window = new AddEditWindow(2, FileManager.GetCurrentDirectory().FullName);
+            window.Closed += (sender2, e2) =>
+            {
+                ButtonRefresh_Click(this, e);
+            };
+            window.ShowDialog();
+        }
+
+        private void ButtonRename_Click(object sender, RoutedEventArgs e)
+        {
+            var item = ListViewDirectory.SelectedItem;
+            if (item != null)
+            {
+
+                AddEditWindow window = null;
+                if (item is FileObject)
+                    window = new AddEditWindow(1, (item as FileObject).File.FullName);
+                else
+                    window = new AddEditWindow(3, (item as DirectoryObject).File.FullName);
+                window.Closed += (sender2, e2) =>
+                {
+                    ButtonRefresh_Click(this, e);
+                };
+                window.ShowDialog();
+            }
+            
+        }
+
+        private void ButtonDelete_Click(object sender, RoutedEventArgs e)
+        {
+            var item = ListViewDirectory.SelectedItem;
+            if (item != null)
+            {
+                if (item is FileObject)
+                    FileManager.Delete((item as FileObject).File);
+                else
+                    FileManager.Delete((item as DirectoryObject).File);
+                ButtonRefresh_Click(this, e);
+            }
+        }
+    }
+
+    public class TreeViewMarginConverter : IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            var level = 0;
+            if (value is DependencyObject)
+            {
+                var parent = VisualTreeHelper.GetParent(value as DependencyObject);
+                while (!(parent is TreeView) && (parent != null))
+                {
+                    if (parent is TreeViewItem)
+                        level++;
+                    parent = VisualTreeHelper.GetParent(parent);
+                }
+            }
+            return new Thickness(level * 15, 0, 0, 0); ;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        {
+            return new Thickness(0, 0, 0, 0);
         }
     }
 
